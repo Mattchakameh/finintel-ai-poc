@@ -114,23 +114,24 @@ r1, r2, r3, r4 = st.columns(4)
 
 r1.metric(
     "Concept Micro-F1",
-    format(meeting03_summary["concept_micro_f1"], ".3f"),
+    format(meeting03_summary_data["concept_micro_f1"], ".3f"),
 )
 
 r2.metric(
     "Value Exact Match",
-    format(meeting03_summary["value_exact_match"], ".3f"),
+    format(meeting03_summary_data["value_exact_match"], ".3f"),
 )
 
 r3.metric(
     "Joint Extraction",
-    format(meeting03_summary["joint_extraction"], ".3f"),
+    format(meeting03_summary_data["joint_extraction"], ".3f"),
 )
 
 r4.metric(
     "Historical Retrieval P@5",
-    format(meeting03_summary["retrieval_p_at_5"], ".3f"),
+    format(meeting03_summary_data["retrieval_p_at_5"], ".3f"),
 )
+
 
 st.caption(
     "Concept, value, joint extraction, and retrieval are separate evaluation quantities. "
