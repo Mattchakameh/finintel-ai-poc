@@ -316,7 +316,8 @@ st.info(
     "Meeting 03 advances FinIntel AI from pipeline feasibility to supervised "
     "learning and temporal held-out evaluation. Final hypothesis conclusions "
     "remain deferred until the expanded, company-diverse evaluation."
-)st.stop()
+)
+st.stop()
 
 
 # ----------------------------------------------------------------------
