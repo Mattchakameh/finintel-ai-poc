@@ -22,6 +22,10 @@ from src.data_loader import (
     run_pipeline_validation,
 )
 from src.retrieval import build_faiss_index, live_search
+from src.meeting03_loader import (
+    Meeting03EvidenceError,
+    load_and_validate_meeting03,
+)
 
 ASSETS_DIR = Path(__file__).resolve().parent / "assets"
 
@@ -29,6 +33,192 @@ st.set_page_config(
     page_title="FinIntel AI -- POC Demo",
     layout="wide",
 )
+# ============================================================
+# Meeting navigation
+# ============================================================
+
+dashboard_view = st.sidebar.radio(
+    "FinIntel AI Research Dashboard",
+    [
+        "Meeting 02 — Pipeline Feasibility",
+        "Meeting 03 — Learning & Evaluation",
+    ],
+    index=0,
+)
+
+st.sidebar.caption(
+    "Meeting 02 establishes technical pipeline feasibility. "
+    "Meeting 03 extends the system to supervised learning "
+    "and temporal held-out evaluation."
+)
+# ============================================================
+# Meeting 03 routing
+# ============================================================
+
+if dashboard_view == "Meeting 03 — Learning & Evaluation":
+    try:
+        meeting03_evidence, meeting03_summary_data, meeting03_checks = (
+            load_and_validate_meeting03()
+        )
+    except Meeting03EvidenceError as exc:
+        st.error("Meeting 03 evidence package could not be loaded.")
+        st.code(str(exc))
+        st.stop()
+
+    st.title("FinIntel AI — Meeting 03")
+    st.subheader("Learning & Evaluation")
+
+    st.info(
+        "Meeting 03 extends the validated POC from technical pipeline "
+        "feasibility to supervised learning and temporal held-out evaluation."
+    )
+
+    c1, c2, c3, c4, c5 = st.columns(5)
+
+    c1.metric(
+        "Labeled Samples",
+        meeting03_summary_data["samples"],
+    )
+    c2.metric(
+        "Train",
+        meeting03_summary_data["train_samples"],
+    )
+    c3.metric(
+        "Held-out",
+        meeting03_summary_data["heldout_samples"],
+    )
+    c4.metric(
+        "10-K Filings",
+        meeting03_summary_data["filings"],
+    )
+    c5.metric(
+        "XBRL Concepts",
+        meeting03_summary_data["concepts"],
+    )
+
+    st.divider()
+
+    st.caption(
+        "Meeting 03 evidence package loaded and validated successfully."
+    )
+
+    # Stop here so the original Meeting 02 dashboard below
+    # remains unchanged and runs only when Meeting 02 is selected.
+    # ============================================================
+# Meeting 03 — Evaluation Results
+# ============================================================
+
+st.subheader("Temporal Held-Out Evaluation")
+
+r1, r2, r3, r4 = st.columns(4)
+
+r1.metric(
+    "Concept Micro-F1",
+    f"{meeting03_summary_data['concept_micro_f1']:.3f}",
+)
+
+r2.metric(
+    "Value Exact Match",
+    f"{meeting03_summary_data['value_exact_match']:.3f}",
+)
+
+r3.metric(
+    "Joint Extraction",
+    f"{meeting03_summary_data['joint_extraction']:.3f}",
+)
+
+r4.metric(
+    "Historical Retrieval P@5",
+    f"{meeting03_summary_data['retrieval_p_at_5']:.3f}",
+)
+
+st.caption(
+    "Concept, value, joint extraction, and retrieval are separate evaluation quantities. "
+    "Retrieval P@5 is the historical Meeting 02 retrieval result and is not extraction accuracy."
+)
+
+st.divider()
+
+# ============================================================
+# Current Research Finding
+# ============================================================
+
+st.subheader("Current Pilot Finding")
+
+st.success(
+    "Concept identification succeeded on all six FY2025 temporal held-out samples "
+    "(Micro-F1 = 1.000)."
+)
+
+st.warning(
+    "Financial-value grounding remains the current bottleneck: "
+    "Value Exact Match = 0.167 and Joint Extraction = 0.167."
+)
+
+st.info(
+    "The current pilot does not establish multimodal superiority or "
+    "company-level generalization."
+)
+
+st.divider()
+
+# ============================================================
+# Error Analysis
+# ============================================================
+
+st.subheader("Held-Out Error Analysis")
+
+e1, e2, e3 = st.columns(3)
+
+e1.metric("Held-Out Samples", 6)
+e2.metric("Correct Joint Extractions", 1)
+e3.metric("Value-Selection Errors", 5)
+
+st.markdown(
+    """
+**Observed failure modes**
+
+- **3 / 5 errors:** year / column confusion
+- **2 / 5 errors:** nearby row / metric confusion
+- **6 / 6 predictions:** selected numeric value was present in the corresponding SEC evidence
+"""
+)
+
+st.caption(
+    "Interpretation: the dominant failure is value grounding/selection, "
+    "rather than absence of the target information from the retrieved SEC evidence."
+)
+
+st.divider()
+
+# ============================================================
+# Meeting 03 research boundary
+# ============================================================
+
+st.subheader("Research Boundary")
+
+st.markdown(
+    """
+**Meeting 03 supports**
+
+- supervised training of prediction/fusion components
+- SEC/XBRL-grounded targets
+- temporal held-out pilot evaluation
+- initial six-condition model comparison
+- failure-mode identification
+- statistical testing and power-analysis planning
+
+**Meeting 03 does not yet claim**
+
+- company-level generalization
+- statistically significant multimodal superiority
+- final H1 / H2 / H3 confirmation
+- a power-derived final test-set size
+"""
+)
+
+# Stop before the original Meeting 02 application.
+st.stop()
 
 
 # ----------------------------------------------------------------------
