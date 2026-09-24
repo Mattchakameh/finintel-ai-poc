@@ -1,0 +1,126 @@
+{
+  "metadata": {
+    "project": "FinIntel AI",
+    "meeting": "Meeting 03",
+    "purpose": "Supervised Learning and Held-out Evaluation",
+    "status": "PILOT EVIDENCE — NOT FINAL HYPOTHESIS TESTING"
+  },
+  "dataset": {
+    "companies": 1,
+    "company": "Apple",
+    "filings": 5,
+    "fiscal_years": [
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "labeled_samples": 40,
+    "xbrl_concepts": 6,
+    "train_samples": 34,
+    "heldout_samples": 6,
+    "train_years": "FY2021–FY2024",
+    "heldout_year": "FY2025",
+    "text_evidence_coverage": "40/40",
+    "table_evidence_coverage": "40/40",
+    "valid_text_visual_pairs": "40/40"
+  },
+  "heldout_results": {
+    "concept_correct": "6/6",
+    "concept_micro_f1": 1.0,
+    "concept_macro_f1": 1.0,
+    "value_exact_match": 0.167,
+    "value_correct": "1/6",
+    "joint_extraction": 0.167,
+    "joint_correct": "1/6"
+  },
+  "error_analysis": {
+    "total_value_errors": 5,
+    "year_column_confusion": 3,
+    "nearby_row_metric_confusion": 2,
+    "predicted_values_present_in_evidence": "6/6",
+    "current_bottleneck": "Financial value grounding / selection"
+  },
+  "ablation": [
+    {
+      "model": "Text-only",
+      "parameters": 198406,
+      "micro_f1": 1.0,
+      "macro_f1": 1.0
+    },
+    {
+      "model": "Vision-only",
+      "parameters": 198406,
+      "micro_f1": 0.5,
+      "macro_f1": 0.4
+    },
+    {
+      "model": "Concatenation",
+      "parameters": 395014,
+      "micro_f1": 1.0,
+      "macro_f1": 1.0
+    },
+    {
+      "model": "Cross-modal / no gating",
+      "parameters": 657670,
+      "micro_f1": 1.0,
+      "macro_f1": 1.0
+    },
+    {
+      "model": "Gating / no cross-modal",
+      "parameters": 428424,
+      "micro_f1": 1.0,
+      "macro_f1": 1.0
+    },
+    {
+      "model": "Full model",
+      "parameters": 691336,
+      "micro_f1": 1.0,
+      "macro_f1": 1.0
+    }
+  ],
+  "metric_separation": {
+    "retrieval_precision_at_5": 0.84,
+    "retrieval_source": "Meeting 02 retrieval pilot",
+    "concept_micro_f1": 1.0,
+    "value_exact_match": 0.167,
+    "joint_extraction": 0.167
+  },
+  "statistics_plan": {
+    "primary_model": "Full multimodal",
+    "primary_baseline": "Text-only",
+    "primary_metric": "Micro-F1",
+    "comparison": "Paired",
+    "confidence_interval": "95%",
+    "resampling": "Paired bootstrap / grouped resampling",
+    "grouping": "Filing/company",
+    "alpha": 0.05,
+    "target_power": 0.8,
+    "current_test_n": 6,
+    "adequately_powered": false
+  },
+  "research_boundary": {
+    "multimodal_superiority_claimed": false,
+    "company_generalization_claimed": false,
+    "final_hypotheses_claimed": false,
+    "separate_validation_partition": false,
+    "company_disjoint_final_test": false,
+    "multi_seed_robustness": false
+  },
+  "key_findings": [
+    "Meeting 02 technical pipeline was extended to supervised learning and held-out evaluation.",
+    "40 labeled samples were constructed from five Apple 10-K filings spanning FY2021–FY2025.",
+    "All 40 samples passed text–SEC-table pairing requirements.",
+    "Concept classification achieved Micro-F1 = 1.000 on the six-sample FY2025 temporal held-out pilot.",
+    "Financial-value exact match was 0.167 (1/6).",
+    "Joint concept-plus-value extraction was 0.167 (1/6).",
+    "Three of five value errors were year/column confusions.",
+    "Two of five value errors were nearby-row/metric confusions.",
+    "All six predicted numeric values occurred in the corresponding SEC evidence.",
+    "The current bottleneck is value grounding and selection.",
+    "The pilot does not demonstrate incremental concept-classification benefit from multimodal fusion over text-only.",
+    "Retrieval and extraction metrics are evaluated separately.",
+    "Paired group-aware statistical testing and power/test-size procedures are defined."
+  ]
+}
