@@ -221,7 +221,102 @@ st.markdown(
 )
 
 # Stop before the original Meeting 02 application.
-st.stop()
+# ============================================================
+# Meeting 03 — Requirement Evidence / History
+# ============================================================
+
+st.divider()
+
+st.subheader("Meeting 03 Requirement Evidence")
+st.caption(
+    "Traceability from advisor requirements to the evidence generated "
+    "during the Meeting 03 learning and evaluation cycle."
+)
+
+requirement_groups = [
+    {
+        "group": "Requirements 01–03",
+        "title": "Task Definition & Ground Truth",
+        "status": "✅ Complete",
+        "evidence": (
+            "Exact extraction task defined; value and XBRL concept objectives "
+            "specified; SEC/XBRL-grounded labeling and verification protocol established."
+        ),
+    },
+    {
+        "group": "Requirements 04–07",
+        "title": "Training & Held-Out Evaluation",
+        "status": "✅ Complete",
+        "evidence": (
+            "Prediction/fusion components trained with backpropagation; "
+            "FY2025 temporal held-out evaluation completed; Precision/Recall/F1 "
+            "and value/joint extraction results reported; failure modes analyzed."
+        ),
+    },
+    {
+        "group": "Requirements 08–11",
+        "title": "Dataset, Pairing & Leakage Control",
+        "status": "✅ Complete",
+        "evidence": (
+            "40 labeled samples across five Apple 10-K filings; 40/40 valid "
+            "text–SEC-table pairs; broader 10-K multimodal scope defined; "
+            "temporal leakage controls documented."
+        ),
+    },
+    {
+        "group": "Requirements 12–13",
+        "title": "Model Comparison & Reproducibility",
+        "status": "✅ Complete",
+        "evidence": (
+            "Six controlled model conditions evaluated using the same temporal "
+            "held-out set; parameter counts, optimizer, learning rate, loss, "
+            "epochs, encoders, and random seed documented."
+        ),
+    },
+    {
+        "group": "Requirements 14–15",
+        "title": "Retrieval vs. Extraction",
+        "status": "✅ Complete",
+        "evidence": (
+            "Retrieval relevance, concept classification, value extraction, "
+            "and joint extraction separated as distinct evaluation quantities; "
+            "retrieval relevance rules and future query-level logging protocol defined."
+        ),
+    },
+    {
+        "group": "Requirements 16–17",
+        "title": "Statistical Validation & Power Planning",
+        "status": "✅ Complete",
+        "evidence": (
+            "Primary paired comparison and Micro-F1 outcome pre-specified; "
+            "95% confidence interval and group-aware resampling framework defined; "
+            "alpha = 0.05 and target power = 0.80 established for final test-size planning."
+        ),
+    },
+    {
+        "group": "Requirement 18",
+        "title": "Final Evidence Package",
+        "status": "🟡 In Progress",
+        "evidence": (
+            "Final evidence summary, Completed-vs-WIP matrix, key findings, "
+            "research boundary, and Meeting 03 Streamlit dashboard assembled. "
+            "Final PowerPoint and final checkpoint remain."
+        ),
+    },
+]
+
+for item in requirement_groups:
+    with st.expander(
+        f"{item['group']} — {item['title']} — {item['status']}",
+        expanded=False,
+    ):
+        st.write(item["evidence"])
+
+st.info(
+    "Meeting 03 advances FinIntel AI from pipeline feasibility to supervised "
+    "learning and temporal held-out evaluation. Final hypothesis conclusions "
+    "remain deferred until the expanded, company-diverse evaluation."
+)st.stop()
 
 
 # ----------------------------------------------------------------------
