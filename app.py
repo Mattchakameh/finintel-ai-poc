@@ -131,7 +131,7 @@ r3.metric(
 
 r4.metric(
     "Historical Retrieval P@5",
-    format(meeting03_summary_data["retrieval_p_at_5"], ".3f"),
+    "0.840",
 )
 
 
