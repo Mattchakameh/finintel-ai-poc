@@ -107,7 +107,9 @@ if dashboard_view == "Meeting 03 — Learning & Evaluation":
     # ============================================================
 # Meeting 03 — Evaluation Results
 # ============================================================
-
+meeting03_evidence, meeting03_summary_data, meeting03_checks = (
+    load_and_validate_meeting03()
+)
 st.subheader("Temporal Held-Out Evaluation")
 
 r1, r2, r3, r4 = st.columns(4)
