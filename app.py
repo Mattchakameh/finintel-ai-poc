@@ -293,16 +293,16 @@ requirement_groups = [
             "alpha = 0.05 and target power = 0.80 established for final test-size planning."
         ),
     },
-    {
-        "group": "Requirement 18",
-        "title": "Final Evidence Package",
-        "status": "🟡 In Progress",
-        "evidence": (
-            "Final evidence summary, Completed-vs-WIP matrix, key findings, "
-            "research boundary, and Meeting 03 Streamlit dashboard assembled. "
-            "Final PowerPoint and final checkpoint remain."
-        ),
-    },
+   {
+    "group": "Final Evidence Package",
+    "title": "Meeting 03 Final Evidence Package",
+    "status": "✅ Complete",
+    "evidence": (
+        "Final evidence summary, Completed-vs-WIP matrix, key findings, "
+        "research boundary, Streamlit dashboard, final PowerPoint, "
+        "and final checkpoint completed."
+    ),
+},
 ]
 
 for item in requirement_groups:
