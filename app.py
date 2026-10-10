@@ -26,6 +26,7 @@ from src.meeting03_loader import (
     Meeting03EvidenceError,
     load_and_validate_meeting03,
 )
+from src.meeting04_view import render_meeting04
 
 ASSETS_DIR = Path(__file__).resolve().parent / "assets"
 
@@ -42,15 +43,20 @@ dashboard_view = st.sidebar.radio(
     [
         "Meeting 02 — Pipeline Feasibility",
         "Meeting 03 — Learning & Evaluation",
+        "Meeting 04 — Multimodal Grounding & Fusion",
     ],
     index=0,
 )
 
 st.sidebar.caption(
-    "Meeting 02 establishes technical pipeline feasibility. "
-    "Meeting 03 extends the system to supervised learning "
-    "and temporal held-out evaluation."
+    "Meeting 02 and Meeting 03 preserve earlier research history. "
+    "Meeting 04 is an independent, research-scale experiment: "
+    "30 companies × 5 fiscal years × 6 financial concepts."
 )
+
+if dashboard_view == "Meeting 04 — Multimodal Grounding & Fusion":
+    render_meeting04()
+    st.stop()
 # ============================================================
 # Meeting 03 routing
 # ============================================================
