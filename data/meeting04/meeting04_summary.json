@@ -1,0 +1,48 @@
+{
+  "meeting": "Meeting 04",
+  "status": "COMPLETE",
+  "dataset": {
+    "facts": 900,
+    "companies": 30,
+    "fiscal_years": 5,
+    "metrics": 6,
+    "direct_sec_xbrl": 865,
+    "reconstructed_liabilities": 35
+  },
+  "evaluation": {
+    "clean_targets": 788,
+    "train_targets": 543,
+    "validation_targets": 115,
+    "frozen_test_targets": 130,
+    "models": 4,
+    "seeds_per_model": 5,
+    "training_runs": 20
+  },
+  "final_results": {
+    "A_joint_mean_pct": 23.85,
+    "B_joint_mean_pct": 25.69,
+    "C_joint_mean_pct": 24.92,
+    "D_joint_mean_pct": 27.54,
+    "D_joint_sd_pp": 4.97,
+    "D_minus_C_pp": 2.62,
+    "B_to_C_pp": -0.77
+  },
+  "error_analysis": {
+    "D_wrong_value_pct": 99.79,
+    "D_error_different_sec_filing_fy_pct": 94.27,
+    "scale_mismatch_count": 0
+  },
+  "power_analysis": {
+    "current_targets": 130,
+    "current_power_pct": 19.9,
+    "observed_effect_pp": 2.62,
+    "prospective_planning_targets": 816
+  },
+  "research_boundary": {
+    "official_hypotheses_formally_tested": false,
+    "adaptive_cross_attention_implemented": false,
+    "frozen_test_used_for_training": false,
+    "frozen_test_used_for_tuning": false,
+    "frozen_test_used_for_checkpoint_selection": false
+  }
+}
