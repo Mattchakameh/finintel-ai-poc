@@ -3,7 +3,8 @@ import json
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
-DATA = ROOT / "data"\nSUMMARY_DATA = DATA / "meeting04"
+DATA = ROOT / "data"
+SUMMARY_DATA = DATA / "meeting04"
 
 class Meeting04EvidenceError(RuntimeError):
     pass
@@ -29,12 +30,12 @@ def load_meeting04():
         "30 companies": summary["dataset"]["companies"] == 30,
         "5 fiscal years": summary["dataset"]["fiscal_years"] == 5,
         "6 financial concepts": summary["dataset"]["metrics"] == 6,
-        "20 final runs": predictions[["model","seed"]].drop_duplicates().shape[0] == 20,
+        "20 final runs": predictions[["model", "seed"]].drop_duplicates().shape[0] == 20,
         "130 frozen-test targets": predictions["grounding_id"].nunique() == 130,
         "4 candidates per test target": candidates.groupby("grounding_id").size().eq(4).all(),
     }
     if not all(checks.values()):
         raise Meeting04EvidenceError(
-            "Validation failed: " + ", ".join(k for k,v in checks.items() if not v)
+            "Validation failed: " + ", ".join(k for k, v in checks.items() if not v)
         )
     return summary, predictions, histories, candidates, checks
