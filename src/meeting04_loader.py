@@ -3,14 +3,14 @@ import json
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
-DATA = ROOT / "data" / "meeting04"
+DATA = ROOT / "data"\nSUMMARY_DATA = DATA / "meeting04"
 
 class Meeting04EvidenceError(RuntimeError):
     pass
 
 def load_meeting04():
     paths = {
-        "summary": DATA / "meeting04_summary.json",
+        "summary": SUMMARY_DATA / "meeting04_summary.json",
         "predictions": DATA / "predictions_compact.csv",
         "histories": DATA / "histories_compact.csv",
         "candidates": DATA / "meeting04_test_candidates.csv",
