@@ -1,3 +1,4 @@
+from pathlib import Path
 import pandas as pd
 import streamlit as st
 from src.meeting04_loader import load_meeting04, Meeting04EvidenceError
@@ -9,6 +10,7 @@ MODEL_NAMES = {
     "D": "D — FinIntel Learned Fusion",
 }
 CONCEPTS = ["Revenue", "Assets", "Liabilities", "Equity", "Net Income", "Cash"]
+M04_VISUAL_DIR = Path(__file__).resolve().parents[1] / "assets" / "meeting04"
 
 def _pct(x):
     return f"{100*x:.2f}%"
@@ -35,8 +37,8 @@ def render_meeting04():
     st.markdown("**Six concepts:** Revenue · Assets · Liabilities · Equity · Net Income · Cash")
 
     tabs = st.tabs([
-        "Research Overview", "Live Grounding Explorer", "Model Playground",
-        "Training Lab", "Fusion & Conditions", "Power & Boundary"
+        "Research Overview", "Live Grounding Explorer", "SEC Visual Evidence",
+        "Model Playground", "Training Lab", "Fusion & Conditions", "Power & Boundary"
     ])
 
     with tabs[0]:
@@ -74,6 +76,57 @@ def render_meeting04():
             )
 
     with tabs[2]:
+        st.markdown("### Original SEC Visual Evidence Lab")
+        st.caption(
+            "Browser-rendered original SEC table evidence archived during Meeting 04. "
+            "These images are evidence artifacts only; changing controls does not retrain or rerun the model."
+        )
+        available = sorted(M04_VISUAL_DIR.glob("*.png")) if M04_VISUAL_DIR.exists() else []
+        if not available:
+            st.warning("No Meeting 04 SEC visual assets are bundled in this deployment yet.")
+        else:
+            tickers = sorted({x.name.split("_FY")[0] for x in available})
+            vtick = st.selectbox("Evidence company", tickers, key="vistick")
+            company_imgs = [x for x in available if x.name.startswith(vtick + "_FY")]
+            years = sorted({int(x.name.split("_FY")[1].split("_TABLE")[0]) for x in company_imgs})
+            vfy = st.selectbox("Evidence fiscal year", years, key="visfy")
+            year_imgs = [x for x in company_imgs if f"_FY{vfy}_" in x.name]
+            table_names = [x.name for x in year_imgs]
+            selected_name = st.selectbox("SEC table region", table_names, key="vistable")
+            selected_path = M04_VISUAL_DIR / selected_name
+            left, right = st.columns([1.35, 1])
+            with left:
+                st.image(str(selected_path), caption=selected_name, use_container_width=True)
+            with right:
+                st.markdown("#### Grounding + archived prediction")
+                cq = c[(c.ticker.eq(vtick)) & (c.target_fiscal_year.eq(vfy))].copy()
+                metrics_here = sorted(cq.metric.unique())
+                if metrics_here:
+                    vmetric = st.selectbox("Financial concept", metrics_here, key="vismetric")
+                    cq = cq[cq.metric.eq(vmetric)]
+                    if len(cq):
+                        gid = cq.grounding_id.iloc[0]
+                        st.caption(f"Grounding ID: {gid}")
+                        show = cq[["candidate_value","candidate_sec_fy","candidate_type","label"]].reset_index(drop=True)
+                        show.index.name = "Candidate index"
+                        st.dataframe(show, use_container_width=True)
+                        vm = st.selectbox("Archived model", list(MODEL_NAMES), format_func=lambda x: MODEL_NAMES[x], key="vismodel")
+                        vs = st.selectbox("Seed", [11,22,33,44,55], key="visseed")
+                        pred = p[(p.model.eq(vm)) & (p.seed.eq(vs)) & (p.grounding_id.eq(gid))]
+                        if len(pred):
+                            r = pred.iloc[0]
+                            a1,a2,a3 = st.columns(3)
+                            a1.metric("True value", f"{r.true_candidate_value:,.0f}")
+                            a2.metric("Predicted value", f"{r.predicted_candidate_value:,.0f}")
+                            a3.metric("Joint", "CORRECT" if bool(r.joint_correct) else "WRONG")
+                        else:
+                            st.info("This grounding target is outside the clean Frozen-Test prediction cohort.")
+                st.caption(
+                    "The SEC image and candidate/prediction records are archived artifacts. "
+                    "Table-region selection is visual inspection; candidate_sec_fy is filing FY metadata."
+                )
+
+    with tabs[3]:
         st.markdown("### Archived Model Playground")
         m = st.selectbox("Model", list(MODEL_NAMES), format_func=lambda x: MODEL_NAMES[x])
         seed = st.selectbox("Seed", [11,22,33,44,55])
@@ -92,7 +145,7 @@ def render_meeting04():
             hide_index=True, use_container_width=True
         )
 
-    with tabs[3]:
+    with tabs[4]:
         st.markdown("### Training Diagnostics")
         m = st.selectbox("Training model", list(MODEL_NAMES), format_func=lambda x: MODEL_NAMES[x], key="tm")
         seed = st.selectbox("Training seed", [11,22,33,44,55], key="ts")
@@ -104,7 +157,7 @@ def render_meeting04():
         x.metric("Best epoch", int(best.epoch))
         y.metric("Best validation Joint", _pct(best.val_joint_accuracy))
 
-    with tabs[4]:
+    with tabs[5]:
         st.markdown("### Model Comparison — Live Filters Over Frozen Test")
         companies = st.multiselect("Companies", sorted(p.ticker.unique()), default=sorted(p.ticker.unique()))
         metrics = st.multiselect("Concepts", sorted(p.metric.unique()), default=sorted(p.metric.unique()))
@@ -129,7 +182,7 @@ def render_meeting04():
             "94.27% of Model D errors selected a candidate associated with a different SEC filing FY."
         )
 
-    with tabs[5]:
+    with tabs[6]:
         st.markdown("### Power Analysis & Research Boundary")
         a,b,d = st.columns(3)
         a.metric("Observed D − C", "+2.62 pp")
