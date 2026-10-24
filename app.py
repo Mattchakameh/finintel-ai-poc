@@ -21,12 +21,13 @@ from src.data_loader import (
     load_poc_data,
     run_pipeline_validation,
 )
-from src.retrieval import build_faiss_index, live_search
 from src.meeting03_loader import (
     Meeting03EvidenceError,
     load_and_validate_meeting03,
 )
 from src.meeting04_view import render_meeting04
+from src.meeting05_view import render_meeting05
+from src.retrieval import build_faiss_index, live_search
 
 ASSETS_DIR = Path(__file__).resolve().parent / "assets"
 
@@ -44,6 +45,7 @@ dashboard_view = st.sidebar.radio(
         "Meeting 02 — Pipeline Feasibility",
         "Meeting 03 — Learning & Evaluation",
         "Meeting 04 — Multimodal Grounding & Fusion",
+        "Meeting 05 — Grounding Audit & Diagnostics",
     ],
     index=0,
 )
@@ -51,8 +53,13 @@ dashboard_view = st.sidebar.radio(
 st.sidebar.caption(
     "Meeting 02 and Meeting 03 preserve earlier research history. "
     "Meeting 04 is an independent, research-scale experiment: "
-    "30 companies × 5 fiscal years × 6 financial concepts."
+    "30 companies × 5 fiscal years × 6 financial concepts. "
+    "Meeting 05 separates neural diagnostics from rule-based source extraction."
 )
+
+if dashboard_view == "Meeting 05 — Grounding Audit & Diagnostics":
+    render_meeting05()
+    st.stop()
 
 if dashboard_view == "Meeting 04 — Multimodal Grounding & Fusion":
     render_meeting04()
@@ -111,219 +118,219 @@ if dashboard_view == "Meeting 03 — Learning & Evaluation":
     # Stop here so the original Meeting 02 dashboard below
     # remains unchanged and runs only when Meeting 02 is selected.
     # ============================================================
-# Meeting 03 — Evaluation Results
-# ============================================================
-meeting03_evidence, meeting03_summary_data, meeting03_checks = (
-    load_and_validate_meeting03()
-)
-st.subheader("Temporal Held-Out Evaluation")
+    # Meeting 03 — Evaluation Results
+    # ============================================================
+    meeting03_evidence, meeting03_summary_data, meeting03_checks = (
+        load_and_validate_meeting03()
+    )
+    st.subheader("Temporal Held-Out Evaluation")
 
-r1, r2, r3, r4 = st.columns(4)
+    r1, r2, r3, r4 = st.columns(4)
 
-r1.metric(
-    "Concept Micro-F1",
-    format(meeting03_summary_data["concept_micro_f1"], ".3f"),
-)
+    r1.metric(
+        "Concept Micro-F1",
+        format(meeting03_summary_data["concept_micro_f1"], ".3f"),
+    )
 
-r2.metric(
-    "Value Exact Match",
-    format(meeting03_summary_data["value_exact_match"], ".3f"),
-)
+    r2.metric(
+        "Value Exact Match",
+        format(meeting03_summary_data["value_exact_match"], ".3f"),
+    )
 
-r3.metric(
-    "Joint Extraction",
-    format(meeting03_summary_data["joint_extraction"], ".3f"),
-)
+    r3.metric(
+        "Joint Extraction",
+        format(meeting03_summary_data["joint_extraction"], ".3f"),
+    )
 
-r4.metric(
-    "Historical Retrieval P@5",
-    "0.840",
-)
+    r4.metric(
+        "Historical Retrieval P@5",
+        "0.840",
+    )
 
 
-st.caption(
-    "Concept, value, joint extraction, and retrieval are separate evaluation quantities. "
-    "Retrieval P@5 is the historical Meeting 02 retrieval result and is not extraction accuracy."
-)
+    st.caption(
+        "Concept, value, joint extraction, and retrieval are separate evaluation quantities. "
+        "Retrieval P@5 is the historical Meeting 02 retrieval result and is not extraction accuracy."
+    )
 
-st.divider()
+    st.divider()
 
-# ============================================================
-# Current Research Finding
-# ============================================================
+    # ============================================================
+    # Current Research Finding
+    # ============================================================
 
-st.subheader("Current Pilot Finding")
+    st.subheader("Current Pilot Finding")
 
-st.success(
-    "Concept identification succeeded on all six FY2025 temporal held-out samples "
-    "(Micro-F1 = 1.000)."
-)
+    st.success(
+        "Concept identification succeeded on all six FY2025 temporal held-out samples "
+        "(Micro-F1 = 1.000)."
+    )
 
-st.warning(
-    "Financial-value grounding remains the current bottleneck: "
-    "Value Exact Match = 0.167 and Joint Extraction = 0.167."
-)
+    st.warning(
+        "Financial-value grounding remains the current bottleneck: "
+        "Value Exact Match = 0.167 and Joint Extraction = 0.167."
+    )
 
-st.info(
-    "The current pilot does not establish multimodal superiority or "
-    "company-level generalization."
-)
+    st.info(
+        "The current pilot does not establish multimodal superiority or "
+        "company-level generalization."
+    )
 
-st.divider()
+    st.divider()
 
-# ============================================================
-# Error Analysis
-# ============================================================
+    # ============================================================
+    # Error Analysis
+    # ============================================================
 
-st.subheader("Held-Out Error Analysis")
+    st.subheader("Held-Out Error Analysis")
 
-e1, e2, e3 = st.columns(3)
+    e1, e2, e3 = st.columns(3)
 
-e1.metric("Held-Out Samples", 6)
-e2.metric("Correct Joint Extractions", 1)
-e3.metric("Value-Selection Errors", 5)
+    e1.metric("Held-Out Samples", 6)
+    e2.metric("Correct Joint Extractions", 1)
+    e3.metric("Value-Selection Errors", 5)
 
-st.markdown(
+    st.markdown(
+        """
+    **Observed failure modes**
+
+    - **3 / 5 errors:** year / column confusion
+    - **2 / 5 errors:** nearby row / metric confusion
+    - **6 / 6 predictions:** selected numeric value was present in the corresponding SEC evidence
     """
-**Observed failure modes**
+    )
 
-- **3 / 5 errors:** year / column confusion
-- **2 / 5 errors:** nearby row / metric confusion
-- **6 / 6 predictions:** selected numeric value was present in the corresponding SEC evidence
-"""
-)
+    st.caption(
+        "Interpretation: the dominant failure is value grounding/selection, "
+        "rather than absence of the target information from the retrieved SEC evidence."
+    )
 
-st.caption(
-    "Interpretation: the dominant failure is value grounding/selection, "
-    "rather than absence of the target information from the retrieved SEC evidence."
-)
+    st.divider()
 
-st.divider()
+    # ============================================================
+    # Meeting 03 research boundary
+    # ============================================================
 
-# ============================================================
-# Meeting 03 research boundary
-# ============================================================
+    st.subheader("Research Boundary")
 
-st.subheader("Research Boundary")
+    st.markdown(
+        """
+    **Meeting 03 supports**
 
-st.markdown(
+    - supervised training of prediction/fusion components
+    - SEC/XBRL-grounded targets
+    - temporal held-out pilot evaluation
+    - initial six-condition model comparison
+    - failure-mode identification
+    - statistical testing and power-analysis planning
+
+    **Meeting 03 does not yet claim**
+
+    - company-level generalization
+    - statistically significant multimodal superiority
+    - final H1 / H2 / H3 confirmation
+    - a power-derived final test-set size
     """
-**Meeting 03 supports**
+    )
 
-- supervised training of prediction/fusion components
-- SEC/XBRL-grounded targets
-- temporal held-out pilot evaluation
-- initial six-condition model comparison
-- failure-mode identification
-- statistical testing and power-analysis planning
+    # Stop before the original Meeting 02 application.
+    # ============================================================
+    # Meeting 03 — Requirement Evidence / History
+    # ============================================================
 
-**Meeting 03 does not yet claim**
+    st.divider()
 
-- company-level generalization
-- statistically significant multimodal superiority
-- final H1 / H2 / H3 confirmation
-- a power-derived final test-set size
-"""
-)
+    st.subheader("Meeting 03 Requirement Evidence")
+    st.caption(
+        "Traceability from advisor requirements to the evidence generated "
+        "during the Meeting 03 learning and evaluation cycle."
+    )
 
-# Stop before the original Meeting 02 application.
-# ============================================================
-# Meeting 03 — Requirement Evidence / History
-# ============================================================
-
-st.divider()
-
-st.subheader("Meeting 03 Requirement Evidence")
-st.caption(
-    "Traceability from advisor requirements to the evidence generated "
-    "during the Meeting 03 learning and evaluation cycle."
-)
-
-requirement_groups = [
-    {
-        "group": "Requirements 01–03",
-        "title": "Task Definition & Ground Truth",
+    requirement_groups = [
+        {
+            "group": "Requirements 01–03",
+            "title": "Task Definition & Ground Truth",
+            "status": "✅ Complete",
+            "evidence": (
+                "Exact extraction task defined; value and XBRL concept objectives "
+                "specified; SEC/XBRL-grounded labeling and verification protocol established."
+            ),
+        },
+        {
+            "group": "Requirements 04–07",
+            "title": "Training & Held-Out Evaluation",
+            "status": "✅ Complete",
+            "evidence": (
+                "Prediction/fusion components trained with backpropagation; "
+                "FY2025 temporal held-out evaluation completed; Precision/Recall/F1 "
+                "and value/joint extraction results reported; failure modes analyzed."
+            ),
+        },
+        {
+            "group": "Requirements 08–11",
+            "title": "Dataset, Pairing & Leakage Control",
+            "status": "✅ Complete",
+            "evidence": (
+                "40 labeled samples across five Apple 10-K filings; 40/40 valid "
+                "text–SEC-table pairs; broader 10-K multimodal scope defined; "
+                "temporal leakage controls documented."
+            ),
+        },
+        {
+            "group": "Requirements 12–13",
+            "title": "Model Comparison & Reproducibility",
+            "status": "✅ Complete",
+            "evidence": (
+                "Six controlled model conditions evaluated using the same temporal "
+                "held-out set; parameter counts, optimizer, learning rate, loss, "
+                "epochs, encoders, and random seed documented."
+            ),
+        },
+        {
+            "group": "Requirements 14–15",
+            "title": "Retrieval vs. Extraction",
+            "status": "✅ Complete",
+            "evidence": (
+                "Retrieval relevance, concept classification, value extraction, "
+                "and joint extraction separated as distinct evaluation quantities; "
+                "retrieval relevance rules and future query-level logging protocol defined."
+            ),
+        },
+        {
+            "group": "Requirements 16–17",
+            "title": "Statistical Validation & Power Planning",
+            "status": "✅ Complete",
+            "evidence": (
+                "Primary paired comparison and Micro-F1 outcome pre-specified; "
+                "95% confidence interval and group-aware resampling framework defined; "
+                "alpha = 0.05 and target power = 0.80 established for final test-size planning."
+            ),
+        },
+       {
+        "group": "Final Evidence Package",
+        "title": "Meeting 03 Final Evidence Package",
         "status": "✅ Complete",
         "evidence": (
-            "Exact extraction task defined; value and XBRL concept objectives "
-            "specified; SEC/XBRL-grounded labeling and verification protocol established."
+            "Final evidence summary, Completed-vs-WIP matrix, key findings, "
+            "research boundary, Streamlit dashboard, final PowerPoint, "
+            "and final checkpoint completed."
         ),
     },
-    {
-        "group": "Requirements 04–07",
-        "title": "Training & Held-Out Evaluation",
-        "status": "✅ Complete",
-        "evidence": (
-            "Prediction/fusion components trained with backpropagation; "
-            "FY2025 temporal held-out evaluation completed; Precision/Recall/F1 "
-            "and value/joint extraction results reported; failure modes analyzed."
-        ),
-    },
-    {
-        "group": "Requirements 08–11",
-        "title": "Dataset, Pairing & Leakage Control",
-        "status": "✅ Complete",
-        "evidence": (
-            "40 labeled samples across five Apple 10-K filings; 40/40 valid "
-            "text–SEC-table pairs; broader 10-K multimodal scope defined; "
-            "temporal leakage controls documented."
-        ),
-    },
-    {
-        "group": "Requirements 12–13",
-        "title": "Model Comparison & Reproducibility",
-        "status": "✅ Complete",
-        "evidence": (
-            "Six controlled model conditions evaluated using the same temporal "
-            "held-out set; parameter counts, optimizer, learning rate, loss, "
-            "epochs, encoders, and random seed documented."
-        ),
-    },
-    {
-        "group": "Requirements 14–15",
-        "title": "Retrieval vs. Extraction",
-        "status": "✅ Complete",
-        "evidence": (
-            "Retrieval relevance, concept classification, value extraction, "
-            "and joint extraction separated as distinct evaluation quantities; "
-            "retrieval relevance rules and future query-level logging protocol defined."
-        ),
-    },
-    {
-        "group": "Requirements 16–17",
-        "title": "Statistical Validation & Power Planning",
-        "status": "✅ Complete",
-        "evidence": (
-            "Primary paired comparison and Micro-F1 outcome pre-specified; "
-            "95% confidence interval and group-aware resampling framework defined; "
-            "alpha = 0.05 and target power = 0.80 established for final test-size planning."
-        ),
-    },
-   {
-    "group": "Final Evidence Package",
-    "title": "Meeting 03 Final Evidence Package",
-    "status": "✅ Complete",
-    "evidence": (
-        "Final evidence summary, Completed-vs-WIP matrix, key findings, "
-        "research boundary, Streamlit dashboard, final PowerPoint, "
-        "and final checkpoint completed."
-    ),
-},
-]
+    ]
 
-for item in requirement_groups:
-    with st.expander(
-        f"{item['group']} — {item['title']} — {item['status']}",
-        expanded=False,
-    ):
-        st.write(item["evidence"])
+    for item in requirement_groups:
+        with st.expander(
+            f"{item['group']} — {item['title']} — {item['status']}",
+            expanded=False,
+        ):
+            st.write(item["evidence"])
 
-st.info(
-    "Meeting 03 advances FinIntel AI from pipeline feasibility to supervised "
-    "learning and temporal held-out evaluation. Final hypothesis conclusions "
-    "remain deferred until the expanded, company-diverse evaluation."
-)
-st.stop()
+    st.info(
+        "Meeting 03 advances FinIntel AI from pipeline feasibility to supervised "
+        "learning and temporal held-out evaluation. Final hypothesis conclusions "
+        "remain deferred until the expanded, company-diverse evaluation."
+    )
+    st.stop()
 
 
 # ----------------------------------------------------------------------

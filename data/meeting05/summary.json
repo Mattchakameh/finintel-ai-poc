@@ -1,0 +1,325 @@
+{
+  "schema_version": 1,
+  "as_of": "2026-10-24",
+  "models": [
+    {
+      "Model": "A",
+      "Input / fusion": "FinBERT: question + numeric candidate text"
+    },
+    {
+      "Model": "B",
+      "Input / fusion": "FinBERT: question + candidate + SEC table text; no image"
+    },
+    {
+      "Model": "C",
+      "Input / fusion": "B text + ViT image; concatenation and linear scorer"
+    },
+    {
+      "Model": "D",
+      "Input / fusion": "B text + ViT image; elementwise sigmoid gated fusion, not cross-attention"
+    },
+    {
+      "Model": "M05 CandidateTileHead",
+      "Input / fusion": "Distinct implementation: hidden 256 query/tile/position projections, attention and GELU nonlinear scorer; not original D weights"
+    }
+  ],
+  "results": [
+    {
+      "id": "corrected115",
+      "title": "Source-corrected Validation replay",
+      "cohort": "Same 115 Validation targets; five frozen CONTROL heads",
+      "regime": "Neural versus numeric rule + frozen neural fallback",
+      "rows": [
+        {
+          "Method": "Frozen neural",
+          "Exact-choice %": 41.04347826086957
+        },
+        {
+          "Method": "Numeric-support rule + neural fallback",
+          "Exact-choice %": 53.56521739130435
+        }
+      ],
+      "limit": "Exploratory reused Validation, not a sealed Test result. Same frozen weights; the gain is hybrid logic, not neural learning. Rule covers 33/115. Upstream evidence localization is answer-assisted."
+    },
+    {
+      "id": "original115",
+      "title": "Historical wrong-row intervention",
+      "cohort": "Original-label 115 Validation targets; five seeds",
+      "regime": "Neural CandidateTileHead",
+      "rows": [
+        {
+          "Method": "CONTROL",
+          "Exact-choice %": 43.4783
+        },
+        {
+          "Method": "WRONG_ROW",
+          "Exact-choice %": 42.2609
+        }
+      ],
+      "limit": "No mean gain. Original labels differ from the source-corrected replay; do not compare the percentages as a training improvement."
+    },
+    {
+      "id": "period20",
+      "title": "Item 15 \u2014 Annual versus quarter",
+      "cohort": "New 20 Validation queries / 10 source pairs; five frozen CONTROL heads",
+      "regime": "Neural whole-image T=1 replay",
+      "rows": [
+        {
+          "Method": "Whole-image replay",
+          "Exact-choice %": 19.0
+        }
+      ],
+      "limit": "SD 4.18 percentage points. No pair both correct in any seed. Small new diagnostic, not a decline from the 115-target benchmark. No training or Test evaluation. T=1 attention cannot demonstrate spatial selection."
+    },
+    {
+      "id": "concept80",
+      "title": "Item 17 \u2014 Similar concepts",
+      "cohort": "New 80 Validation queries; 192 Train queries; five text-head seeds",
+      "regime": "Neural text-head comparison",
+      "rows": [
+        {
+          "Method": "v1 text head",
+          "Exact-choice %": 39.25
+        },
+        {
+          "Method": "v2 source-context repair",
+          "Exact-choice %": 37.25
+        }
+      ],
+      "limit": "SD 0.68 and 0.56 pp respectively. Repair removed truncation and added source units/dates/signs, but did not improve accuracy. Source-pair queries are correlated; companies reused. Not original 115-target accuracy."
+    },
+    {
+      "id": "parser80",
+      "title": "Item 17 \u2014 Conditional string parser",
+      "cohort": "Same v2 strings on 80 Validation queries",
+      "regime": "Train-defined rules; not neural",
+      "rows": [
+        {
+          "Method": "Conditional parser correct/all",
+          "Exact-choice %": 90.0
+        }
+      ],
+      "limit": "72/80 correct; 72 answered, 8 abstentions for unseen HD Net sales alias. Assumes supplied table has correct issuer. Strict independent issuer-from-evidence mode has 0/80 coverage. Not independently entity-verified extraction."
+    },
+    {
+      "id": "source105",
+      "title": "Item 6 \u2014 Structured source repair",
+      "cohort": "Same 105 eligible Validation targets / 420 unchanged candidate rows",
+      "regime": "Fixed numeric rules + extra provided HTML/XBRL",
+      "rows": [
+        {
+          "Method": "Old evidence correct/all",
+          "Exact-choice %": 27.61904761904762
+        },
+        {
+          "Method": "Repaired cell/header correct/all",
+          "Exact-choice %": 99.04761904761905
+        }
+      ],
+      "limit": "Old: 29 answered / 29 correct. Repaired: 105 answered / 104 correct. Ten selector abstentions excluded identically. Extra structured-source extraction, NOT 99% neural accuracy. One DUK source-version mismatch remains. Provided catalog, not autonomous discovery; generic negative-sign amendment after evaluation disclosed."
+    }
+  ],
+  "items": [
+    {
+      "number": 1,
+      "title": "Audit previous results",
+      "status": "COMPLETE_SCOPED",
+      "verified_result": "Historical audit verified 19/19 original weight files; reconstructed Model A seed 55 was checked.",
+      "remaining_or_limit": "Audit completion does not remove documented research limitations."
+    },
+    {
+      "number": 2,
+      "title": "Negative-candidate construction",
+      "status": "COMPLETE_DOCUMENTATION",
+      "verified_result": "Original generator was traced and documented.",
+      "remaining_or_limit": "Candidate construction and evidence localization contain answer-assisted assumptions; not end-to-end retrieval."
+    },
+    {
+      "number": 3,
+      "title": "Simple year-matching baseline",
+      "status": "COMPLETE_SCOPED",
+      "verified_result": "Validation 104/115 correct across all targets, with abstention counted unsuccessful.",
+      "remaining_or_limit": "Uses candidate period metadata; not deployment extraction accuracy."
+    },
+    {
+      "number": 4,
+      "title": "Comparison with temporal grounding",
+      "status": "COMPLETE_SCOPED",
+      "verified_result": "Rule 104/115 versus temporal 105/115; only changed selection is HD target 394.",
+      "remaining_or_limit": "Same historical Validation cohort; metadata availability and reference semantics remain separate issues."
+    },
+    {
+      "number": 5,
+      "title": "Realistic period-information availability",
+      "status": "COMPLETE_SCOPED_AUDIT_AND_CONTRACT",
+      "verified_result": "Audited 2,632 candidate rows across 658 Train/Validation queries: 1,216 unique source-period matches, 1,416 missing. Implemented source-provenance/period-preservation contract; 20 unit tests and 720 permutation checks pass.",
+      "remaining_or_limit": "Availability inventory uses privileged exact-concept mapping, not deployment accuracy. Inline-XBRL period preservation is operational; arbitrary image/PDF-only extraction is not implemented or claimed."
+    },
+    {
+      "number": 6,
+      "title": "Answer-independent evidence selection",
+      "status": "COMPLETE_SCOPED_REPAIR_AND_COMPONENT_EXPERIMENT",
+      "verified_result": "Implemented and ran query-only provided-HTML selector: 444/543 Train and 105/115 Validation selections, with 440 and 104 corrected-reference matches. All 25 guard tests and independent provenance checks pass. On the same 105 Validation targets / 420 unchanged candidate rows, fixed numeric-rule old evidence answers 29/29 correctly; repaired selected-cell/header evidence answers 105 with 104 matches. Ten selector abstentions are excluded identically; all 29 old correct answers are retained.",
+      "remaining_or_limit": "This is selector plus structured source-cell serialization using extra HTML/XBRL, NOT a neural accuracy improvement. One DUK source-version discrepancy remains. Generic scope abstentions, inherited document catalog, arbitrary PDF deployment and independent financial adjudication remain limitations. Post-evaluation generic negative-sign serialization amendment is disclosed; no original labels or images are replaced."
+    },
+    {
+      "number": 7,
+      "title": "Exact model input contract",
+      "status": "COMPLETE_DOCUMENTATION",
+      "verified_result": "Query, candidate number forms, text windows and image usage documented for each model.",
+      "remaining_or_limit": "Do not describe query/candidate-conditioned models as image-only."
+    },
+    {
+      "number": 8,
+      "title": "Image contribution experiment",
+      "status": "COMPLETE_SCOPED",
+      "verified_result": "Five-run query/candidate/image experiment reported 30.4348% value accuracy on 115 Validation targets.",
+      "remaining_or_limit": "Input includes query and numeric candidate, so this is not a pure image-only baseline."
+    },
+    {
+      "number": 9,
+      "title": "Gating behavior and image sensitivity",
+      "status": "COMPLETE_DIAGNOSTIC",
+      "verified_result": "Five-seed gate coefficients and original Model D image perturbations reported.",
+      "remaining_or_limit": "Gate coefficients are not causal importance weights; scoped perturbation is not full modality validation."
+    },
+    {
+      "number": 10,
+      "title": "Modality dropout",
+      "status": "COMPLETE_EXPERIMENT",
+      "verified_result": "Matched experiment and precision-aware closure tables saved; mean improvement not shown.",
+      "remaining_or_limit": "FP32 reevaluation of selected checkpoints is not a new training run; retain large seed variation."
+    },
+    {
+      "number": 11,
+      "title": "Historical Model C image cancellation",
+      "status": "COMPLETE_DIAGNOSTIC",
+      "verified_result": "Shared image contribution cancels in historical linear candidate ranking; 115-target diagnostic saved.",
+      "remaining_or_limit": "Do not apply this historical linear-model defect to the current nonlinear candidate head."
+    },
+    {
+      "number": 12,
+      "title": "Image tiling",
+      "status": "COMPLETE_EXPERIMENT",
+      "verified_result": "Whole-image 44.0000% versus native-tile 42.4348% in the recorded five-seed Validation comparison.",
+      "remaining_or_limit": "The tested tiling method did not improve mean accuracy; this does not rule out other readable representations."
+    },
+    {
+      "number": 13,
+      "title": "Wrong-row training intervention",
+      "status": "COMPLETE_EXPERIMENT",
+      "verified_result": "CONTROL 43.4783% versus WRONG_ROW 42.2609% on original 115 Validation targets.",
+      "remaining_or_limit": "No demonstrated mean gain; keep matched 19-target challenge separate from full Validation."
+    },
+    {
+      "number": 14,
+      "title": "Scale sensitivity",
+      "status": "COMPLETE_SCOPED",
+      "verified_result": "SCALE_DOWN and SCALE_UP evaluated on the same 9-target subset across five seeds.",
+      "remaining_or_limit": "Small selected subset; sensitivity is not proof of unit understanding."
+    },
+    {
+      "number": 15,
+      "title": "True annual-versus-quarter grounding",
+      "status": "COMPLETE_SCOPED_DIAGNOSTIC",
+      "verified_result": "Constructed 15 genuine annual/quarter source pairs (30 queries: 10 Train, 20 Validation). Executed five frozen CONTROL heads with verified original whole-image T=1 preprocessing. Validation exact-choice mean 19.00% \u00b1 4.18 pp; 0/10 paired-both-correct in every seed. Independent checkpoint replay passes. Text-feature-branch intervention is 23%; native-tile OOD intervention is 22%, separately retained.",
+      "remaining_or_limit": "Period-understanding claim is not supported on this small explicit-date challenge. This negative result is not a decline from the unrelated 115-target benchmark. Structured-context selector is an operational metadata baseline, not neural understanding. New offline source-table composites differ from the historical corpus; no Test evaluation or training was performed."
+    },
+    {
+      "number": 16,
+      "title": "Integrated comparison of error types",
+      "status": "COMPLETE_SCOPED_REPORT",
+      "verified_result": "Scale, wrong-row and quarterly-option reports integrated and saved with matched within-diagnostic comparisons.",
+      "remaining_or_limit": "Keep 9-, 19- and 29-target cohorts distinct; do not pool their accuracy."
+    },
+    {
+      "number": 17,
+      "title": "Expansion to similar financial concepts",
+      "status": "COMPLETE_SCOPED_EXPANSION_AND_REPAIR_EXPERIMENT",
+      "verified_result": "Audited seven concepts over 150 filings and built a balanced two-concept \u00d7 two-period challenge. Final cohort is 192 Train / 80 Validation queries from 68 source pairs; ambiguous source tables excluded before fitting. Five-seed text-head v1 exact-choice 39.25% \u00b1 0.68 pp. Same-cohort v2 source-context reserialization fits all 1,088 inputs within 145\u2013173 tokens; exact-choice 37.25% \u00b1 0.56 pp (\u22122.00 pp), concept-choice projection 70.50%, period-choice projection 51.50%. Both sets of checkpoints independently replayed. A separate Train-defined string-only parser on the same v2 inputs answers 72/80 Validation queries, all 72 correct; 8 unseen HD Net sales alias cases abstain. Strict independent issuer-from-evidence mode answers 0/80 because issuer headers are absent.",
+      "remaining_or_limit": "Expansion and representation repair were executed, but v2 did not improve accuracy. These are new exploratory 80-target metrics, not original 115-target model accuracy or standalone taxonomy-head accuracy. V2 adds explicit source units/dates/signs, so it is not a pure truncation-only ablation. Historical development companies are reused; source-pair queries are correlated; no Test outcomes used. The parser result is conditional supplied-table recoverability, not neural uplift or independently entity-verified extraction. Generic date/type guards were added as disclosed post-evaluation QA without changing decisions."
+    },
+    {
+      "number": 18,
+      "title": "Mean and standard-deviation tables",
+      "status": "COMPLETE_SCOPED_REPORT",
+      "verified_result": "Base performance tables and 29-target quarterly supplement saved and reconciled.",
+      "remaining_or_limit": "Tables reflect different models, cohorts and information regimes; no undifferentiated leaderboard."
+    },
+    {
+      "number": 19,
+      "title": "Reconcile 900 to 788 retained targets",
+      "status": "COMPLETE_RECONCILIATION",
+      "verified_result": "788 retained; 35 reconstructed, 57 unresolved visual, 15 DOM/XBRL-only and 5 invalid-visual exclusions.",
+      "remaining_or_limit": "Exclusion reasons and cohort changes are not evidence that every retained target is semantically clean."
+    },
+    {
+      "number": 20,
+      "title": "Interpret the 816-sample estimate",
+      "status": "COMPLETE_ASSUMPTIONS_AUDIT",
+      "verified_result": "Original calculation reproduced and assumptions documented.",
+      "remaining_or_limit": "816 remains an unadjusted conditional planning estimate, not a universal required sample size."
+    },
+    {
+      "number": 22,
+      "title": "Final report, tracker and slides",
+      "status": "COMPLETE_SCOPED",
+      "verified_result": "Separate review notebook, report and tracker delivered. Revised 40-slide editable PowerPoint and 40-page PDF verified saved at the existing artifact IDs; access permissions unchanged.",
+      "remaining_or_limit": "Scientific limitations retained. Blackboard, Streamlit and Literature Review are outside this delivery."
+    }
+  ],
+  "links": {
+    "Safe review notebook": "https://colab.research.google.com/drive/1_HKHCV-XIM5n36OdAeWOse-qbM_uxjUG",
+    "Final report": "https://drive.google.com/file/d/12vnCP1jteaB9kC6KYBtRB0P7qKWbJCyK/view",
+    "Item tracker": "https://drive.google.com/file/d/1FmEAnEEqJHg4hKwEr1rFCaUlWAIBeVdy/view",
+    "Evidence artifacts": "https://drive.google.com/drive/folders/184MVOTQZQD2k-JL2oYXw5NoBBnhAGftX",
+    "Slide deck (verified 40-slide revision)": "https://docs.google.com/presentation/d/1eKp96QaFoLcnvxDocBhMRZ3Gdnzhy_vG/edit",
+    "PDF (verified 40-page revision)": "https://drive.google.com/file/d/15C8i66NqpF-H5t-UJTwdpj1W9iES1erN/view"
+  },
+  "provenance": [
+    {
+      "source": "m05_dot_integration/M05_dot_22_item_tracker.json",
+      "sha256": "99ed3fecac3d6cf953592bbc12ffb0e7528525e1c8709caefb03895abfd2ebf9"
+    },
+    {
+      "source": "m05_dot_integration/M05_dot_PROGRESS_REPORT.md",
+      "sha256": "90245c342270635d960876d6d447f0cc98109ae9a16b781b149925fb7ed58a79"
+    },
+    {
+      "source": "m05_full_feature_audit/corrected_probe/results/summary.json",
+      "sha256": "dc22d95ada622b978bf3f88dc2db49e3a000054ee19ad4440a65976fbba19763"
+    },
+    {
+      "source": "m05_dot_period/full_multimodal_summary.json",
+      "sha256": "10fdcdd8891495a6825ad3ff5c44adc3190072c99b6b3e478d37fed91d6cda45"
+    },
+    {
+      "source": "m05_dot_item17/results/primary_text_scorer_summary.json",
+      "sha256": "77dc9b750c47fbde2a8d4b78cd675fdaf2f5af85fc960f3ffcaeac1f8ae6dbf1"
+    },
+    {
+      "source": "m05_dot_item17/results/v2_text_scorer_summary.json",
+      "sha256": "6c8b7acff1d58e17d5496568746c56681805d6740d336bbddaf09e9df19aad84"
+    },
+    {
+      "source": "m05_dot_item17/results/structured_parser_summary.json",
+      "sha256": "56f4ab4807683a1f8bde969342b7d75d2755c1f7d756cfd4c3aa193d223cd450"
+    },
+    {
+      "source": "m05_dot_evidence/paired_repair/results/paired_summary.json",
+      "sha256": "b3b3c1b6b3a9723bfdf3339d2d44ebe4f106a76889cacca273298e550a76d8e6"
+    },
+    {
+      "source": "m05_comprehensive_root_cause_audit/bundle/05_numeric_hybrid/results/v2/summary.json",
+      "sha256": "9ae2c0119d4adb6c897261430aa9162f4aeef0f97e9ca9ad99089746c1b624ac"
+    },
+    {
+      "source": "m05_audit/source/dependencies/original_training_source.txt",
+      "sha256": "bc9c920690c83b194a63cf535a942d25921a0739ae79ec9f917087e3d7e47742"
+    },
+    {
+      "source": "m05_audit/source/dependencies/candidate_tile_head.py",
+      "sha256": "2d0ec034dc6d26d3eff4974c22807cafa4070242b449d6fc85fe6197264eff3b"
+    }
+  ]
+}
