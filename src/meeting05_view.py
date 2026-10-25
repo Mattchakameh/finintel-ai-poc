@@ -3,12 +3,14 @@ import pandas as pd
 import streamlit as st
 
 from src.meeting05_loader import Meeting05EvidenceError, load_meeting05
+from src.meeting05_revision import load_revision, render_revision
 
 
 def render_meeting05():
     try:
         summary = load_meeting05()
-    except Meeting05EvidenceError as exc:
+        revision = load_revision()
+    except (Meeting05EvidenceError, OSError, ValueError, KeyError, TypeError) as exc:
         st.error(str(exc))
         st.info('Restore the reviewed data/meeting05/summary.json. No substitute results are shown.')
         return
@@ -22,6 +24,7 @@ def render_meeting05():
         'Requirement Evidence', 'Provenance & Artifacts',
     ])
     with overview:
+        render_revision(revision, 'overview')
         st.markdown('### What improved — and what did not')
         st.markdown('''
 - **Evidence reliability:** source alignment, fiscal references, period provenance and table selection were audited and repaired in separate copies.
@@ -34,6 +37,7 @@ def render_meeting05():
         st.write('No new Test evaluation. Reused Validation, answer-assisted historical evidence windows, small correlated challenges and provided source catalogs limit generalization. Completion of scoped deliverables does not confirm the hypotheses.')
         st.caption('Simple year matching (104/115) and temporal grounding (105/115) used candidate-period metadata on historical Validation; neither is deployment extraction accuracy.')
     with results:
+        render_revision(revision, 'results')
         st.info('Select one matched cohort at a time. These results must not be pooled into a single leaderboard.')
         selected = st.selectbox('Evidence cohort', [r['id'] for r in summary['results']],
                                 format_func=lambda value: next(r['title'] for r in summary['results'] if r['id'] == value), key='m05_cohort')
@@ -46,18 +50,16 @@ def render_meeting05():
         st.bar_chart(frame.set_index('Method'))
         st.warning(result['limit'])
     with models:
+        render_revision(revision, 'models')
         st.dataframe(pd.DataFrame(summary['models']), hide_index=True, use_container_width=True)
         st.info('A/B/C/D are all neural configurations. B is text plus table, not image-only. Original D uses sigmoid gated fusion, not cross-attention. Five seeds are repeated runs, not five architectures.')
         st.write('The Meeting 05 CandidateTileHead has its own implementation and fresh CONTROL/WRONG_ROW heads. It does not load original Model D weights. Whole-image T=1 attention has one valid token, so attention weight is necessarily 1 and does not prove learned spatial selection.')
         st.caption('Source-verified against original training classes and M05 candidate_tile_head.py / training_driver.py. Earlier meeting pages remain historical snapshots.')
     with tracker:
-        st.caption('Scoped evidence review starts at item 1. Literature Review is excluded. Scientific limitations remain visible; the revised 40-slide deck and 40-page PDF are verified saved.')
-        for item in summary['items']:
-            with st.expander(f"{item['number']:02d} — {item['title']} — {item['status']}"):
-                st.write(item['verified_result'])
-                st.warning(item['remaining_or_limit'])
+        render_revision(revision, 'tracker')
     with evidence:
-        st.warning('Linked Drive artifacts retain their existing owner-only / authorized access. This app does not grant access, copy private notebooks or broaden sharing. Revised 40-slide deck and 40-page PDF are verified saved; access permissions are unchanged.')
+        render_revision(revision, 'provenance')
+        st.warning('Linked Drive artifacts retain their existing owner-only / authorized access. This app does not grant access, copy private notebooks or broaden sharing. Artifact revision and publication are coordinated separately; no deck/page count is asserted here.')
         for title, url in summary['links'].items():
             st.markdown(f'[{title}]({url})')
         st.caption('Safe notebook: historical executable cells are archived; visible history is non-executable. Run All only inspects the review archive, not the original training workflow.')
