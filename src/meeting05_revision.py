@@ -119,7 +119,7 @@ def render_revision(data, section):
         st.dataframe(pd.DataFrame(data['gates']), hide_index=True)
         st.warning('Gate weights are not causal modality importance; these are original D diagnostics, not CandidateTileHead weights.')
     elif section == 'tracker':
-        st.caption(data['requirements_note'])
+        st.caption('Complete means the scoped experiment or reporting requirement is fulfilled, including negative results. Partial and Open identify remaining work; completion does not imply scientific success.')
         st.subheader('Experiment and reporting requirements')
         st.dataframe(pd.DataFrame([{'Requirement': r['requirement'], 'Current status': {'MET': 'Complete', 'PARTIAL': 'Partial', 'OPEN': 'Open'}[r['status']], 'Evidence and limits': r['remaining_scope']} for r in data['advisor_atom_crosswalk'] if r['id'] not in {'R20', 'R21'}]), hide_index=True)
         st.caption('Current status describes the scoped requirement. Completed reporting does not establish scientific improvement; historical input-audit ratings are retained in the underlying evidence.')

@@ -73,7 +73,7 @@ def test_audited_ui_all_cohorts_and_pilot_separation():
             assert is_pilot(cohort) == group.startswith('Later Pilot')
             app.selectbox(key='m05_audited_cohort').set_value(cohort).run()
             assert not app.exception
-    assert any('MET denotes' in message.value for message in app.caption)
+    assert any('Complete means' in message.value for message in app.caption)
     assert any('Conditional power planning' in heading.value for heading in app.subheader)
 
 
