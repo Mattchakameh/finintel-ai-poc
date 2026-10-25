@@ -121,10 +121,10 @@ def render_revision(data, section):
     elif section == 'tracker':
         st.caption('Complete means the scoped experiment or reporting requirement is fulfilled, including negative results. Partial and Open identify remaining work; completion does not imply scientific success.')
         st.subheader('Experiment and reporting requirements')
-        st.dataframe(pd.DataFrame([{'Requirement': r['requirement'], 'Current status': {'MET': 'Complete', 'PARTIAL': 'Partial', 'OPEN': 'Open'}[r['status']], 'Evidence and limits': r['remaining_scope']} for r in data['advisor_atom_crosswalk'] if r['id'] not in {'R20', 'R21'}]), hide_index=True)
+        st.dataframe(pd.DataFrame([{'Requirement': r['requirement'], 'Current status': requirement_status(r['id'], r['status']), 'Evidence and limits': requirement_evidence(r)} for r in data['advisor_atom_crosswalk'] if r['id'] not in {'R20', 'R21'}]), hide_index=True)
         st.caption('Current status describes the scoped requirement. Completed reporting does not establish scientific improvement; historical input-audit ratings are retained in the underlying evidence.')
         with st.expander('Grouped research status summary'):
-            st.dataframe(pd.DataFrame([{'Requirement': r['id'].replace('_', ' '), 'Current status': {'MET': 'Complete', 'PARTIAL': 'Partial', 'OPEN': 'Open'}[r['status']], 'Evidence and limits': r['scope']} for r in data['requirements'] if r['id'] != 'literature_review']), hide_index=True)
+            st.dataframe(pd.DataFrame([{'Requirement': r['id'].replace('_', ' '), 'Current status': requirement_status(r['id'], r['status']), 'Evidence and limits': r['scope']} for r in data['requirements'] if r['id'] != 'literature_review']), hide_index=True)
         render_power_planning(data)
 
 
@@ -313,3 +313,21 @@ def render_audit_details(value):
             render_audit_details(item)
     else:
         st.write(str(value))
+
+
+def requirement_status(identifier, status):
+    if identifier in {'R2', 'meaningful_value_improvement'}:
+        return 'System improvement demonstrated; learned-model improvement remains open'
+    if identifier == 'R18':
+        return 'Conditional follow-up — not recalculated'
+    return {'MET': 'Complete', 'PARTIAL': 'Partial', 'OPEN': 'Open'}[status]
+
+
+def requirement_evidence(row):
+    if row['id'] == 'R2':
+        return ('Source-reference 114, five seeds: recovered D 28.42% ± 3.08 → row/period source check 62.81% ± 2.60. '
+                'Additional source information, unchanged weights, reused Validation; independent neural improvement is not established.')
+    if row['id'] == 'R18':
+        return ('No new power calculation. Approximately 816 targets comes from the archived paired-test assumptions; '
+                'the effect may be zero. Reused source-assisted Validation gains do not establish an independent neural effect or 575 independent targets.')
+    return row['remaining_scope']

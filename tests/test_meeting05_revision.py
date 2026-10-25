@@ -230,5 +230,6 @@ def test_plain_progress_power_and_current_reporting_status():
     requirements = next(t for t in tables if 'Requirement' in t and 'Main mean±SD table' in t['Requirement'].values)
     statuses = dict(zip(requirements['Requirement'], requirements['Current status']))
     assert statuses['Main mean±SD table'] == 'Complete'
-    assert statuses['Improve correct value selection'] == 'Open'
+    assert statuses['Improve correct value selection'] == 'System improvement demonstrated; learned-model improvement remains open'
+    assert statuses['Revisit power after above-chance progress'] == 'Conditional follow-up — not recalculated'
     assert not any('Run provenance' in e.label for e in app.expander)
