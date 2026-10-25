@@ -29,7 +29,7 @@ def render_meeting05():
     ])
     with overview:
         render_five_seed()
-        with st.expander('Historical evidence and earlier CONTROL diagnostics'):
+        with st.expander('Historical Meeting 04 Test 130 and earlier diagnostics'):
             render_revision(revision, 'overview')
             st.markdown('### What improved — and what did not')
             st.markdown('''

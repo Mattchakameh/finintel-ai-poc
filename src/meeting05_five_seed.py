@@ -30,20 +30,23 @@ def render_five_seed():
     import pandas as pd
     import streamlit as st
     data = load_five_seed()
-    st.subheader('Latest original D replay — five fixed seeds, reused Validation')
+    st.subheader('Meeting 05 results — source-assisted comparison')
     st.info('Original D core is unchanged sigmoid gated fusion. Source-assisted wrappers add recovered full HTML and selected-cell unit metadata; these are system gains, not neural learning or generalization.')
-    st.markdown('**Original D → added source check → source-reference 114 results**')
+    st.markdown('**Recovered D baseline → added source check → source-reference 114 results**')
+    st.caption('Recovered D baseline: weights trained in Meeting 04, evaluated here on reused Validation; the historical Meeting 04 Test 130 table is a separate evaluation.')
     st.write('Baseline: **28.42% ± 3.08** → row/period source check: **62.81% ± 2.60**.')
     st.caption('Value agreement, mean ± sample SD across five fixed seeds. Same reused source-reference 114 targets; additional source information, not improved neural weights.')
     headline_rows = {r['arm']: r for r in data['results']
                      if r['cohort'] == 'certified114_system_yield' and r['variant'] == 'metadata_assisted'}
     compact = []
-    for arm, label, meaning in [('baseline', 'Original D', 'Model prediction only'),
-                                ('row_period', 'Original D + source check', 'Checks the source row and period')]:
+    for arm, label, meaning in [('baseline', 'Recovered D baseline', 'Meeting 04 weights; evaluated here'),
+                                ('row_period', 'Recovered D + source check', 'Checks the source row and period')]:
         metric = headline_rows[arm]['value_accuracy_percent']
         compact.append({'Comparison': label, 'What changes': meaning,
                         'Value agreement — mean ± seed SD': f"{metric['mean']:.2f}% ± {metric['sample_sd']:.2f} pp"})
     st.dataframe(pd.DataFrame(compact), hide_index=True)
+
+    st.caption('On the same source-reference 114 cohort: strict source check 57.37% ± 3.20 pp; row/period source check 62.81% ± 2.60 pp. The earlier 53.57% pilot uses a different cohort and method.')
 
     with st.expander('Technical results — strict method, separate cohorts and concept/joint metrics'):
         labels = {'certified114_system_yield': 'Source-reference 114 — system yield',
