@@ -68,8 +68,14 @@ def is_pilot(cohort):
     return cohort.startswith(('later_Pilot', 'post_M5'))
 
 
+def pilot_method_label(value):
+    return {'no_aux': 'Without extra grounding supervision',
+            'aux': 'With extra row supervision',
+            'row_column_cell_aux': 'With extra row, column and cell supervision'}.get(value, value)
+
+
 def metric_table(metrics):
-    return [{'Model / condition': m.get('display_name', m['model']), 'Metric': m['metric'], 'Mean': m['mean'],
+    return [{'Model / condition': pilot_method_label(m.get('display_name', m['model'])), 'Metric': m['metric'], 'Mean': m['mean'],
              'Seed SD': m['sd'], 'Units': m['units'], 'Targets': m['targets'],
              'Seeds': m['seeds'], 'Label version': ('source_verified_challenge' if m['label_version'] == 'dot_challenge_source_verified' else m['label_version']),
              'Historical cell (1-based)': m.get('historical_cell_1_based'),
@@ -104,6 +110,8 @@ def render_revision(data, section):
         cohort = st.selectbox('Audited evidence cohort', cohorts, key='m05_audited_cohort')
         rows = [m for m in data['metrics'] if m['cohort'] == cohort]
         st.write('Cohort: ' + cohort)
+        if any(m['model'] in {'aux', 'no_aux', 'row_column_cell_aux'} for m in rows):
+            render_aux_definition()
         st.dataframe(pd.DataFrame(metric_table(rows)), hide_index=True)
         for caveat in dict.fromkeys(m['caveat'] for m in rows):
             st.warning(caveat)
@@ -155,13 +163,14 @@ def render_decoder(data):
         st.warning('The earlier uniform-versus-learned comparison below is superseded for attribution by the matched-coverage correction above. It is retained as exploratory history, not evidence of learned grounding advantage.')
     else:
         st.subheader('Exploratory numeric decoder — system change, not neural improvement')
+    render_aux_definition()
     st.caption('Cohort: ' + diagnostic['cohort'] + '; metric: ' + diagnostic['metric'])
     st.warning(diagnostic['summary'])
     st.caption(diagnostic['sd_definition'])
     labels = {'neural': 'Neural baseline', 'uniform': 'Uniform numeric mass',
               'learned': 'Learned numeric mass', 'shuffled_weights': 'One-position cyclic-shift mass',
               'zero_weights': 'Zero mass / neural fallback'}
-    rows = [{'Method': r['arm'], 'Decoder': labels[r['decoder']],
+    rows = [{'Method': pilot_method_label(r['arm']), 'Decoder': labels[r['decoder']],
              'Mean answer credit (%)': r['mean'], 'Seed sample SD (pp)': r['sample_sd'],
              'Numeric decoder accepted / 115': r['accepted'], 'Neural fallback / 115': r['abstained']}
             for r in diagnostic['results']]
@@ -210,6 +219,8 @@ def render_robustness(evidence):
     frame = pd.DataFrame(evidence['results'], columns=evidence['metric_columns']).rename(columns={
         'arm': 'Method', 'control': 'Matched control', 'strict_mean_pct': 'Strict accuracy mean (%)',
         'strict_seed_sd_pp': 'Strict seed sample SD (pp)', 'tie_credit_mean_pct': 'Tie-credit mean (%)'})
+    frame['Method'] = frame['Method'].map(pilot_method_label)
+    render_aux_definition()
     st.dataframe(frame, hide_index=True)
     st.caption(evidence['random_control'])
     st.caption('Strict tie rule: ' + evidence['strict_ties'])
@@ -334,3 +345,9 @@ def requirement_evidence(row):
         return ('No new power calculation. Approximately 816 targets comes from the archived paired-test assumptions; '
                 'the effect may be zero. Reused source-assisted Validation gains do not establish an independent neural effect or 575 independent targets.')
     return row['remaining_scope']
+
+
+def render_aux_definition():
+    import streamlit as st
+    st.caption('AUX means auxiliary grounding supervision: extra training targets for locating the financial row (row pilot), or the row, column and cell (cell pilot); the comparison model has the same answer task without that extra supervision.')
+    st.caption('Separate exploratory pilot on reused Validation 115. Cell supervision used 196 derived training examples out of 543 answer-training examples; labels were automated. Answer accuracy was 32.35% with extra supervision versus 32.52% without, so no robust answer-accuracy gain is established. This is not the 62.81% recovered-D source-check system or D’s fusion gate.')
