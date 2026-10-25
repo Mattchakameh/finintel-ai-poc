@@ -67,3 +67,19 @@ def test_public_snapshot_excludes_private_resource_urls():
     encoded = json.dumps(summary)
     assert 'google.com/' not in encoded
     assert '/Users/' not in encoded
+
+
+def test_integrated_overview_keeps_current_history_and_pilot_distinct():
+    app = AppTest.from_file(str(Path(__file__).resolve().parents[1] / 'app.py'), default_timeout=90).run()
+    app.sidebar.radio[0].set_value(app.sidebar.radio[0].options[3]).run()
+    assert not app.exception
+    headings = [h.value for h in app.subheader]
+    assert headings.index('Meeting 05 results — source-assisted comparison') < headings.index('Historical A–D comparison (Meeting4)')
+    assert 'What is done — and what remains' in headings
+    assert any('not a confidence interval' in c.value for c in app.caption)
+    assert any('A row near 23.85% is model A' in c.value for c in app.caption)
+    assert any(e.label == 'Explore separate cohorts and earlier experiments' for e in app.expander)
+    app.radio(key='m05_period').set_value('Later Pilot — exploratory appendix').run()
+    assert not app.exception
+    assert any('Later pilot — exploratory system diagnostics' == h.value for h in app.subheader)
+    assert not app.get('json')

@@ -80,13 +80,8 @@ def render_revision(data, section):
     import pandas as pd
     import streamlit as st
     if section == 'overview':
-        if 'post_M5_CONTROL_source_hybrid_v13' in data:
-            render_control(data['post_M5_CONTROL_source_hybrid_v13'])
-        if 'final_robustness_audit' in data:
-            st.subheader('Final robustness correction — exploratory pilot')
-            st.warning(data['final_robustness_audit']['conclusion'])
-            st.caption(data['final_robustness_audit']['model'])
-        st.subheader('Original A–D results — archived frozen Test, 130 targets')
+        st.subheader('Historical A–D comparison (Meeting4)')
+        st.caption('Historical frozen Test: 130 targets. A is text-only, B is text + table, C adds image by concatenation, and D uses gated fusion. A row near 23.85% is model A, not the current Meeting 05 recovered-D result. This cohort differs from the current 114-example Validation comparison.')
         st.info('Four-option value-selection chance: 25%. This is not a joint-accuracy significance test.')
         rows = [m for m in data['metrics'] if m['id'].startswith('historical_') and m['metric'] in {'value_accuracy', 'joint_accuracy'}]
         st.dataframe(pd.DataFrame(metric_table(rows)), hide_index=True)
@@ -94,6 +89,12 @@ def render_revision(data, section):
         h1 = next(m for m in data['metrics'] if m['id'] == 'H1_C_minus_B')
         st.warning(h1['caveat'])
         st.caption(data['cohort_policy'])
+        if 'post_M5_CONTROL_source_hybrid_v13' in data:
+            render_control(data['post_M5_CONTROL_source_hybrid_v13'])
+        if 'final_robustness_audit' in data:
+            st.subheader('Final robustness correction — exploratory pilot')
+            st.warning(data['final_robustness_audit']['conclusion'])
+            st.caption(data['final_robustness_audit']['model'])
         render_historical(data)
     elif section == 'results':
         st.subheader('Audited diagnostics — separate cohorts')
@@ -109,6 +110,8 @@ def render_revision(data, section):
         for definition in dict.fromkeys(m['sd_definition'] for m in rows if m.get('sd_definition')):
             st.caption(definition)
         if group == 'Later Pilot — exploratory appendix':
+            st.subheader('Later pilot — exploratory system diagnostics')
+            st.markdown('**Purpose:** test whether source checks and numeric decoding explain apparent gains. **Method:** compare learned, uniform and randomized controls on reused pilot examples. **Outcome:** matched controls do not establish a learned-grounding advantage. These are separate pilot systems and cohorts, not the latest recovered-D comparison or the historical Meeting 04 Test.')
             render_decoder(data)
     elif section == 'models':
         st.subheader('Original model input contract')

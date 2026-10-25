@@ -31,11 +31,8 @@ def render_five_seed():
     import streamlit as st
     data = load_five_seed()
     st.subheader('Meeting 05 results — source-assisted comparison')
-    st.info('Original D core is unchanged sigmoid gated fusion. Source-assisted wrappers add recovered full HTML and selected-cell unit metadata; these are system gains, not neural learning or generalization.')
-    st.markdown('**Recovered D baseline → added source check → source-reference 114 results**')
-    st.caption('Recovered D baseline: weights trained in Meeting 04, evaluated here on reused Validation; the historical Meeting 04 Test 130 table is a separate evaluation.')
-    st.write('Baseline: **28.42% ± 3.08** → row/period source check: **62.81% ± 2.60**.')
-    st.caption('Value agreement, mean ± sample SD across five fixed seeds. Same reused source-reference 114 targets; additional source information, not improved neural weights.')
+    st.write('**28.42% → 62.81%** value agreement after adding a financial-row and reporting-period check.')
+    st.caption('Same 114 checked examples, evaluated across five fixed seeds. Recovered D uses weights trained in Meeting 04; no new neural training is claimed.')
     headline_rows = {r['arm']: r for r in data['results']
                      if r['cohort'] == 'certified114_system_yield' and r['variant'] == 'metadata_assisted'}
     compact = []
@@ -46,7 +43,10 @@ def render_five_seed():
                         'Value agreement — mean ± seed SD': f"{metric['mean']:.2f}% ± {metric['sample_sd']:.2f} pp"})
     st.dataframe(pd.DataFrame(compact), hide_index=True)
 
-    st.caption('On the same source-reference 114 cohort: strict source check 57.37% ± 3.20 pp; row/period source check 62.81% ± 2.60 pp. The earlier 53.57% pilot uses a different cohort and method.')
+    st.caption('Strict meaning/unit check: 57.37% ± 3.20 on the same 114 examples; it does not outperform row/period checking.')
+    st.caption('Mean = average of five seed results. ± is sample standard deviation across those seeds, in percentage points; it is not a confidence interval or uncertainty over new companies.')
+    st.markdown('**How it works:** keep D’s prediction unless an accepted source check replaces it. The checks use additional HTML and unit metadata; they improve this system on reused Validation, not the learned weights.')
+    st.warning('Four companies, reused Validation. No independent-generalization, new Test, H1/H2 or neural-learning conclusion.')
 
     with st.expander('Meeting 05 technical results — choose one evaluation set'):
         labels = {'certified114_system_yield': 'Checked source values (114 examples)',
@@ -66,10 +66,11 @@ def render_five_seed():
                 item[label + ' seed SD (pp)'] = row[key]['sample_sd']
             table.append(item)
         st.dataframe(pd.DataFrame(table).round(2), hide_index=True)
-    st.caption('Mean ± sample SD across seeds 11, 22, 33, 44, 55. Random controls average five randomizations within each model seed. SD is not a target/cluster confidence interval.')
-    st.warning('Row/period exceeds strict. Five seeds share reused Validation targets in four companies, not 575 independent examples. No new Test evaluation, neural-learning, H1/H2 or generalization conclusion.')
-    st.caption('Checked source values (114 examples) excludes one quarantined Duke Energy example. It includes one Home Depot example whose correct source answer is absent from the original options; the separate 113-example set excludes that case. Original labels (115 examples) measure agreement with the original labels, not source truth. Original options remain unchanged.')
-    st.caption('Visible-only wrappers make no overrides. Concept logits remain unchanged. Historical Test130 and CandidateTileHead CONTROL use different conditions and remain separate below.')
-    st.info('New-data inventory: 225 compatible facts; 0 benchmark-ready examples. Counts are not accuracy or evidence of training readiness.')
+    with st.expander('Evaluation limits and differences between example sets'):
+        st.caption('Mean ± sample SD across seeds 11, 22, 33, 44, 55. Random controls average five randomizations within each model seed. SD is not a target/cluster confidence interval.')
+        st.warning('Row/period exceeds strict. Five seeds share reused Validation targets in four companies, not 575 independent examples. No new Test evaluation, neural-learning, H1/H2 or generalization conclusion.')
+        st.caption('Checked source values (114 examples) excludes one quarantined Duke Energy example. It includes one Home Depot example whose correct source answer is absent from the original options; the separate 113-example set excludes that case. Original labels (115 examples) measure agreement with the original labels, not source truth. Original options remain unchanged.')
+        st.caption('Visible-only wrappers make no overrides. Concept logits remain unchanged. Historical Test130 and CandidateTileHead CONTROL use different conditions and remain separate below.')
+        st.info('New-data inventory: 225 compatible facts; 0 benchmark-ready examples. Counts are not accuracy or evidence of training readiness.')
     with st.expander('Replay verification'):
         st.write('Independent saved-output audit accepted all 575 baseline choices and 10,350 wrapper rows. Choice parity does not establish bitwise-logit or historical-concept parity; the exact historical model revision is unrecorded.')
