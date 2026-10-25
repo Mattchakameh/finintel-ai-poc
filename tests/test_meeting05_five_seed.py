@@ -56,7 +56,7 @@ def test_neutral_labels_preserve_source_records():
     assert not app.exception
     for frame in app.dataframe:
         assert 'm05_dot_' not in frame.value.to_json()
-    assert any(e.label == 'Run provenance and SHA-256 digests' for e in app.expander)
+    assert not any('SHA-256' in e.label for e in app.expander)
 
 
 def test_public_snapshot_excludes_private_resource_urls():

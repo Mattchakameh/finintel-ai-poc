@@ -120,19 +120,12 @@ def render_revision(data, section):
         st.warning('Gate weights are not causal modality importance; these are original D diagnostics, not CandidateTileHead weights.')
     elif section == 'tracker':
         st.caption(data['requirements_note'])
-        st.subheader('All 21 requirement items')
-        st.dataframe(pd.DataFrame(data['advisor_atom_crosswalk']), hide_index=True)
+        st.subheader('Experiment and reporting requirements')
+        st.dataframe(pd.DataFrame([{'Requirement': r['requirement'], 'Current status': {'MET': 'Complete', 'PARTIAL': 'Partial', 'OPEN': 'Open'}[r['status']], 'Evidence and limits': r['remaining_scope']} for r in data['advisor_atom_crosswalk'] if r['id'] not in {'R20', 'R21'}]), hide_index=True)
+        st.caption('Current status describes the scoped requirement. Completed reporting does not establish scientific improvement; historical input-audit ratings are retained in the underlying evidence.')
         with st.expander('Grouped research status summary'):
-            st.dataframe(pd.DataFrame(data['requirements']), hide_index=True)
-        st.subheader('Literature review progress — completion remains open')
-        st.json(data['literature_review_progress'])
-        st.subheader('Conditional power planning')
-        st.json({k: v for k, v in data['power'].items() if not k.endswith('sha256')})
-        st.warning(data['power']['caveat'])
-    elif section == 'provenance':
-        st.caption('Canonical review SHA-256: ' + data['canonical_sha256'])
-        st.caption('Public manifest SHA-256: ' + data['public_manifest_sha256'])
-        st.caption('Historical notebook cells use 1-based numbering. Source references identify evidence without exposing private files.')
+            st.dataframe(pd.DataFrame([{'Requirement': r['id'].replace('_', ' '), 'Current status': {'MET': 'Complete', 'PARTIAL': 'Partial', 'OPEN': 'Open'}[r['status']], 'Evidence and limits': r['scope']} for r in data['requirements'] if r['id'] != 'literature_review']), hide_index=True)
+        render_power_planning(data)
 
 
 def render_historical(data):
@@ -144,7 +137,7 @@ def render_historical(data):
     st.write(evidence['summary'])
     st.info(evidence['R5_scope'])
     with st.expander('Historical saved observations and evidence sources'):
-        st.json(evidence['stored_observations'])
+        render_audit_details(evidence['stored_observations'])
         st.dataframe(pd.DataFrame(evidence['sources']), hide_index=True)
         st.warning('Not established: ' + '; '.join(evidence['not_established']))
 
@@ -173,11 +166,9 @@ def render_decoder(data):
     st.info(diagnostic['control_definition'])
     st.warning(diagnostic['provenance_limit'])
     st.caption(diagnostic['protocol_timing'])
-    with st.expander('Decoder audit and exact source hashes'):
+    with st.expander('Decoder verification'):
         st.write(diagnostic['oracle_scope'])
-        st.write(diagnostic['verification'])
-        st.json(diagnostic['source_hashes'])
-        st.caption('Audit SHA-256: ' + diagnostic['audit_sha256'])
+        render_audit_details(diagnostic['verification'])
 
 
 def validate_robustness(evidence):
@@ -221,10 +212,9 @@ def render_robustness(evidence):
     st.caption('Strict tie rule: ' + evidence['strict_ties'])
     st.warning(evidence['independence'])
     st.warning(evidence['scope_limit'])
-    with st.expander('Robustness verification and source hashes'):
-        st.json(evidence['order_checks'])
-        st.json(evidence['feasibility'])
-        st.json(evidence['source_hashes'])
+    with st.expander('Robustness verification'):
+        render_audit_details(evidence['order_checks'])
+        render_audit_details(evidence['feasibility'])
 
 
 def validate_control(evidence):
@@ -269,10 +259,57 @@ def render_control(evidence):
     st.warning('Five proposed value/candidate patches remain unapplied; 11 quarantines remain. The data package is not fully cleaned or training-ready.')
     with st.expander('Company coverage and data/order audit — counts are not accuracy'):
         st.write('Strict overrides by company (counts, not company accuracy):')
-        st.json(evidence['company_strict_overrides'])
+        render_audit_details(evidence['company_strict_overrides'])
         st.write('Reference status counts (not accuracy):')
-        st.json(evidence['reference_status_counts'])
+        render_audit_details(evidence['reference_status_counts'])
         st.write('Reversible order-copy checks; no new accuracy measured:')
-        st.json(evidence['order_copy'])
+        render_audit_details(evidence['order_copy'])
         st.caption('The 60 forward pairs cover 12 unique targets; repeated route/deletion checks are not independent evaluation samples.')
-        st.json(evidence['source_hashes'])
+
+
+def render_power_planning(data):
+    import pandas as pd
+    import streamlit as st
+    power = data['power']
+    st.subheader('Conditional power planning')
+    st.write(f"**Approximately {power['required_n']:,} independent targets** under the archived assumptions. This is conditional planning, not a completed power recalculation or a confirmed sample-size recommendation.")
+    st.dataframe(pd.DataFrame([
+        ('Statistical test', power['statistical_reproduction']),
+        ('Significance level (alpha)', f"{power['alpha']:.2f}"),
+        ('Target power', f"{power['power']:.0%}"),
+        ('Archived sample', f"{power['targets']} targets across {power['companies']} companies"),
+        ('Analysis unit', 'Target-level paired difference, averaged across seeds'),
+        ('Independence assumption', 'Targets assumed independent; company clustering is not adjusted'),
+    ], columns=['Planning assumption', 'Description']), hide_index=True)
+    st.warning(power['caveat'])
+    with st.expander('Technical details: archived power calculation'):
+        st.dataframe(pd.DataFrame([
+            ('Mean paired difference (percentage points)', f"{power['mean_difference_pp']:.4f}"),
+            ('Paired SD (percentage points)', f"{power['paired_sd_pp']:.4f}"),
+            ('Variance (squared percentage points)', f"{power['variance_pp_squared']:.4f}"),
+            ('Standardized paired effect (dz)', f"{power['dz']:.6f}"),
+            ('Estimated power in the archived sample', f"{power['current_power']:.2%}"),
+            ('Historical notebook cell (1-based)', str(power['historical_cell_1_based'])),
+            ('Original implementation verified', 'Yes' if power['original_implementation_verified'] else 'No — original implementation source was unavailable'),
+        ], columns=['Archived quantity', 'Value']), hide_index=True)
+
+
+def render_audit_details(value):
+    """Readable retained audit facts, without serialized objects or source digests."""
+    import streamlit as st
+    if isinstance(value, dict):
+        for key, item in value.items():
+            if any(token in key.lower() for token in ('sha256', 'hash')):
+                continue
+            label = key.replace('_', ' ').capitalize()
+            if isinstance(item, (dict, list)):
+                st.markdown(f'**{label}**')
+                render_audit_details(item)
+            else:
+                shown = 'Not established' if item is None else ('Yes' if item is True else 'No' if item is False else str(item))
+                st.write(f'{label}: {shown}')
+    elif isinstance(value, list):
+        for item in value:
+            render_audit_details(item)
+    else:
+        st.write(str(value))

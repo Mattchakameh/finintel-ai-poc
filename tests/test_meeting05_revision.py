@@ -74,7 +74,7 @@ def test_audited_ui_all_cohorts_and_pilot_separation():
             app.selectbox(key='m05_audited_cohort').set_value(cohort).run()
             assert not app.exception
     assert any('MET denotes' in message.value for message in app.caption)
-    assert any('progress' in heading.value.lower() for heading in app.subheader)
+    assert any('Conditional power planning' in heading.value for heading in app.subheader)
 
 
 def test_final_control_labels_and_all_requirement_items():
@@ -211,3 +211,24 @@ def test_control_rejects_cohort_conflation_and_code():
     evidence['code_proof'] = {}
     with pytest.raises(ValueError, match='scope'):
         validate_control(evidence)
+
+
+def test_plain_progress_power_and_current_reporting_status():
+    from streamlit.testing.v1 import AppTest
+    app = AppTest.from_file(str(Path(__file__).resolve().parents[1] / 'app.py'), default_timeout=90).run()
+    app.sidebar.radio[0].set_value(app.sidebar.radio[0].options[3]).run()
+    assert not app.exception
+    assert not app.get('json')
+    assert not app.code
+    tables = [frame.value for frame in app.dataframe]
+    assert not any('literature review' in x.value.lower() for x in app.subheader)
+    assert not any('Literature Review' in t.to_json() for t in tables)
+    power = next(t for t in tables if 'Archived quantity' in t)
+    assert dict(power.values)['Variance (squared percentage points)'] == '709.3858'
+    assert any('816' in x.value and 'conditional planning' in x.value for x in app.markdown)
+    assert any('650 seed-target rows are not independent' in x.value for x in app.warning)
+    requirements = next(t for t in tables if 'Requirement' in t and 'Main mean±SD table' in t['Requirement'].values)
+    statuses = dict(zip(requirements['Requirement'], requirements['Current status']))
+    assert statuses['Main mean±SD table'] == 'Complete'
+    assert statuses['Improve correct value selection'] == 'Open'
+    assert not any('Run provenance' in e.label for e in app.expander)

@@ -65,6 +65,5 @@ def render_five_seed():
     st.caption('Source-reference 114 includes one reference absent from the original options; candidate-available 113 excludes that case. Legacy 115 measures original-label agreement, not source truth. Original options remain unchanged.')
     st.caption('Visible-only wrappers make no overrides. Concept logits remain unchanged. Historical Test130 and CandidateTileHead CONTROL use different conditions and remain separate below.')
     st.info('New-data inventory: 225 compatible facts; 0 benchmark-ready examples. Counts are not accuracy or evidence of training readiness.')
-    with st.expander('Replay verification and aggregate source hashes'):
+    with st.expander('Replay verification'):
         st.write('Independent saved-output audit accepted all 575 baseline choices and 10,350 wrapper rows. Choice parity does not establish bitwise-logit or historical-concept parity; the exact historical model revision is unrecorded.')
-        st.json({k: data[k] for k in ('source_sha256', 'audit_report_sha256')})
