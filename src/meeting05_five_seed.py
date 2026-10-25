@@ -49,14 +49,15 @@ def render_five_seed():
     st.caption('On the same source-reference 114 cohort: strict source check 57.37% ± 3.20 pp; row/period source check 62.81% ± 2.60 pp. The earlier 53.57% pilot uses a different cohort and method.')
 
     with st.expander('Meeting 05 technical results — choose one evaluation set'):
-        labels = {'certified114_system_yield': 'Source-reference 114 — system yield',
+        labels = {'certified114_system_yield': 'Checked source values (114 examples)',
                   'all115_legacy': 'Original labels (115 examples)',
-                  'certified_candidate_available113': 'Candidate-available 113 — restricted subset'}
+                  'certified_candidate_available113': 'Correct answer available (113 examples)'}
         cohort = st.selectbox('Original D replay cohort', list(labels), format_func=labels.get, key='m05_d_replay_cohort')
         variant = st.selectbox('Source information', ['metadata_assisted', 'visible_only'], format_func=lambda v: {'metadata_assisted': 'Additional source metadata', 'visible_only': 'Visible inputs only — no overrides'}[v], key='m05_d_replay_variant')
         st.caption('Current Meeting 05 recovered-D evaluation: ' + labels[cohort] + '. Five seeds, reused Validation; unchanged Meeting 04 model weights. Alternative evaluation sets must not be pooled.')
-        method_labels = {'baseline': 'Recovered D baseline', 'number_only': 'Number-only source check', 'row_period': 'Row/period source check', 'strict_scope_unit': 'Strict scope/unit source check', 'random_override': 'Random override control'}
+        method_labels = {'baseline': 'Recovered D baseline', 'number_only': 'Match number only', 'row_period': 'Match financial row and reporting period', 'strict_scope_unit': 'Verify financial meaning and units', 'random_override': 'Random replacement (comparison control)'}
         rows = [r for r in data['results'] if r['cohort'] == cohort and r['variant'] == variant]
+        st.caption('Source checks replace the recovered D answer only when accepted; otherwise the D answer is preserved. Number-only checks the number; row/period also checks the financial row and reporting period. Strict checks financial meaning (for example, profit before tax versus net income, or consolidated versus segment) and units/scale. Random replacement is deliberately random and is only a comparison control.')
         table = []
         for row in rows:
             item = {'Method': method_labels[row['arm']], 'Targets per seed': row['N_per_seed']}
@@ -67,7 +68,7 @@ def render_five_seed():
         st.dataframe(pd.DataFrame(table).round(2), hide_index=True)
     st.caption('Mean ± sample SD across seeds 11, 22, 33, 44, 55. Random controls average five randomizations within each model seed. SD is not a target/cluster confidence interval.')
     st.warning('Row/period exceeds strict. Five seeds share reused Validation targets in four companies, not 575 independent examples. No new Test evaluation, neural-learning, H1/H2 or generalization conclusion.')
-    st.caption('Source-reference 114 includes one reference absent from the original options; candidate-available 113 excludes that case. Original labels (115 examples) measure agreement with the original labels, not source truth. Original options remain unchanged.')
+    st.caption('Checked source values (114 examples) excludes one quarantined Duke Energy example. It includes one Home Depot example whose correct source answer is absent from the original options; the separate 113-example set excludes that case. Original labels (115 examples) measure agreement with the original labels, not source truth. Original options remain unchanged.')
     st.caption('Visible-only wrappers make no overrides. Concept logits remain unchanged. Historical Test130 and CandidateTileHead CONTROL use different conditions and remain separate below.')
     st.info('New-data inventory: 225 compatible facts; 0 benchmark-ready examples. Counts are not accuracy or evidence of training readiness.')
     with st.expander('Replay verification'):
