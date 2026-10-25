@@ -57,6 +57,10 @@ def load_revision(path=None):
             raise ValueError('Decoder mean disagrees with seeds')
         if not math.isclose(statistics.stdev(row['seeds']), row['sample_sd'], abs_tol=1e-8):
             raise ValueError('Decoder SD disagrees with seeds')
+    if 'final_robustness_audit' in data:
+        validate_robustness(data['final_robustness_audit'])
+    if 'post_M5_CONTROL_source_hybrid_v13' in data:
+        validate_control(data['post_M5_CONTROL_source_hybrid_v13'])
     return data
 
 
@@ -67,15 +71,21 @@ def is_pilot(cohort):
 def metric_table(metrics):
     return [{'Model / condition': m.get('display_name', m['model']), 'Metric': m['metric'], 'Mean': m['mean'],
              'Seed SD': m['sd'], 'Units': m['units'], 'Targets': m['targets'],
-             'Seeds': m['seeds'], 'Label version': m['label_version'],
+             'Seeds': m['seeds'], 'Label version': ('source_verified_challenge' if m['label_version'] == 'dot_challenge_source_verified' else m['label_version']),
              'Historical cell (1-based)': m.get('historical_cell_1_based'),
-             'Evidence source': m.get('source_reference')} for m in metrics]
+             'Evidence source': ('Meeting 05 requirement tracker' if m.get('source_reference') == 'M05_dot_22_item_tracker.json' else m.get('source_reference'))} for m in metrics]
 
 
 def render_revision(data, section):
     import pandas as pd
     import streamlit as st
     if section == 'overview':
+        if 'post_M5_CONTROL_source_hybrid_v13' in data:
+            render_control(data['post_M5_CONTROL_source_hybrid_v13'])
+        if 'final_robustness_audit' in data:
+            st.subheader('Final robustness correction — exploratory pilot')
+            st.warning(data['final_robustness_audit']['conclusion'])
+            st.caption(data['final_robustness_audit']['model'])
         st.subheader('Original A–D results — archived frozen Test, 130 targets')
         st.info('Four-option value-selection chance: 25%. This is not a joint-accuracy significance test.')
         rows = [m for m in data['metrics'] if m['id'].startswith('historical_') and m['metric'] in {'value_accuracy', 'joint_accuracy'}]
@@ -143,14 +153,19 @@ def render_decoder(data):
     import pandas as pd
     import streamlit as st
     diagnostic = data['post_M5_numeric_decoder_diagnostic']
-    st.subheader('Exploratory numeric decoder — system change, not neural improvement')
+    if 'final_robustness_audit' in data:
+        render_robustness(data['final_robustness_audit'])
+        st.subheader('Earlier exploratory decoder history — unequal coverage')
+        st.warning('The earlier uniform-versus-learned comparison below is superseded for attribution by the matched-coverage correction above. It is retained as exploratory history, not evidence of learned grounding advantage.')
+    else:
+        st.subheader('Exploratory numeric decoder — system change, not neural improvement')
     st.caption('Cohort: ' + diagnostic['cohort'] + '; metric: ' + diagnostic['metric'])
     st.warning(diagnostic['summary'])
     st.caption(diagnostic['sd_definition'])
     labels = {'neural': 'Neural baseline', 'uniform': 'Uniform numeric mass',
               'learned': 'Learned numeric mass', 'shuffled_weights': 'One-position cyclic-shift mass',
               'zero_weights': 'Zero mass / neural fallback'}
-    rows = [{'Arm': r['arm'], 'Decoder': labels[r['decoder']],
+    rows = [{'Method': r['arm'], 'Decoder': labels[r['decoder']],
              'Mean answer credit (%)': r['mean'], 'Seed sample SD (pp)': r['sample_sd'],
              'Numeric decoder accepted / 115': r['accepted'], 'Neural fallback / 115': r['abstained']}
             for r in diagnostic['results']]
@@ -163,3 +178,101 @@ def render_decoder(data):
         st.write(diagnostic['verification'])
         st.json(diagnostic['source_hashes'])
         st.caption('Audit SHA-256: ' + diagnostic['audit_sha256'])
+
+
+def validate_robustness(evidence):
+    expected_columns = ['arm', 'control', 'strict_mean_pct', 'strict_seed_sd_pp', 'tie_credit_mean_pct']
+    if evidence['metric_columns'] != expected_columns:
+        raise ValueError('Robustness metric definitions changed')
+    if (evidence['common_acceptance'], evidence['common_fallback']) != (106, 9):
+        raise ValueError('Robustness coverage must be matched')
+    expected = {(arm, control) for arm in ('no_aux', 'row_column_cell_aux')
+                for control in ('matched_uniform', 'matched_learned', 'matched_random')}
+    rows = evidence['results']
+    if len(rows) != 6 or {(r[0], r[1]) for r in rows} != expected:
+        raise ValueError('Missing matched robustness control')
+    for row in rows:
+        if len(row) != 5 or not all(isinstance(v, (int, float)) and math.isfinite(v) for v in row[2:]):
+            raise ValueError('Invalid robustness metric')
+        if not (0 <= row[2] <= 100 and row[3] >= 0 and 0 <= row[4] <= 100):
+            raise ValueError('Robustness metric outside range')
+    for key in ('model', 'cohort', 'random_control', 'strict_ties', 'independence',
+                'conclusion', 'scope_limit', 'source_hashes'):
+        if not evidence[key]:
+            raise ValueError('Missing robustness context')
+    if evidence['originalD_modified_or_evaluated']:
+        raise ValueError('Robustness must remain distinct from original D')
+
+
+def render_robustness(evidence):
+    import pandas as pd
+    import streamlit as st
+    validate_robustness(evidence)
+    st.subheader('Correction: matched-coverage numeric decoder controls')
+    st.warning(evidence['conclusion'])
+    st.caption('Model: ' + evidence['model'] + '. Cohort: ' + evidence['cohort'])
+    st.info('Every method/control: 106 accepted and 9 neural fallbacks out of 115 targets. '
+            'Strict accuracy and fractional tie credit are separate metrics.')
+    frame = pd.DataFrame(evidence['results'], columns=evidence['metric_columns']).rename(columns={
+        'arm': 'Method', 'control': 'Matched control', 'strict_mean_pct': 'Strict accuracy mean (%)',
+        'strict_seed_sd_pp': 'Strict seed sample SD (pp)', 'tie_credit_mean_pct': 'Tie-credit mean (%)'})
+    st.dataframe(frame, hide_index=True)
+    st.caption(evidence['random_control'])
+    st.caption('Strict tie rule: ' + evidence['strict_ties'])
+    st.warning(evidence['independence'])
+    st.warning(evidence['scope_limit'])
+    with st.expander('Robustness verification and source hashes'):
+        st.json(evidence['order_checks'])
+        st.json(evidence['feasibility'])
+        st.json(evidence['source_hashes'])
+
+
+def validate_control(evidence):
+    if evidence['seeds'] != [11, 22, 33, 44, 55]:
+        raise ValueError('CONTROL requires five fixed seeds')
+    if evidence['certified_counts']['Validation'] != 114 or evidence['all_counts']['Validation'] != 115:
+        raise ValueError('CONTROL cohort mismatch')
+    if 'NOT original Model D' not in evidence['model'] or 'code_proof' in evidence:
+        raise ValueError('CONTROL identity or public scope mismatch')
+    rows = evidence['validation_results']
+    if len(rows) != 5 or {r['arm'] for r in rows} != {'baseline', 'number_only', 'row_period', 'strict_scope_unit', 'random_override'}:
+        raise ValueError('Missing CONTROL arm')
+    for row in rows:
+        for key in ('certified_Val114_mean_sd_percent', 'all_Val115_mean_sd_percent'):
+            mean, sd = row[key]
+            if not all(math.isfinite(x) for x in (mean, sd)) or not 0 <= mean <= 100 or sd < 0:
+                raise ValueError('Invalid CONTROL metric')
+    if evidence['order_copy']['new_accuracy_measured'] is not False:
+        raise ValueError('Order checks are not accuracy')
+
+
+def render_control(evidence):
+    import pandas as pd
+    import streamlit as st
+    st.subheader('CandidateTileHead CONTROL SYSTEM — posthoc readout')
+    st.caption(evidence['model'])
+    st.warning('Reused development Validation, four companies. Extra full HTML and selected-cell unit metadata change the available information. No neural-learning, joint-accuracy, H1/H2, fresh-Test or independent-generalization claim.')
+    st.caption('Value-only results; mean ± seed SD across five fixed seeds: 11, 22, 33, 44, 55. Posthoc system comparison.')
+    labels = {'baseline': 'Baseline', 'number_only': 'Number only', 'row_period': 'Row + period',
+              'strict_scope_unit': 'Strict scope + unit', 'random_override': 'Random override'}
+    def table(key):
+        return pd.DataFrame([{'System method': labels[r['arm']], 'Value accuracy (%)': r[key][0],
+                              'Seed SD (pp)': r[key][1]} for r in evidence['validation_results']])
+    st.markdown('**Certified reused Validation — 114 targets**')
+    st.dataframe(table('certified_Val114_mean_sd_percent'), hide_index=True)
+    st.info('Row + period (73.3333%) exceeds strict scope + unit (67.8947%) on certified Validation 114. A strict-system advantage is not established.')
+    with st.expander('Separate legacy cohort — all Validation 115 targets'):
+        st.caption('Different denominator and certification scope; do not combine with Validation 114 or original frozen Test 130.')
+        st.dataframe(table('all_Val115_mean_sd_percent'), hide_index=True)
+    for limit in evidence['limits']:
+        st.caption(limit)
+    st.warning('Five proposed value/candidate patches remain unapplied; 11 quarantines remain. The data package is not fully cleaned or training-ready.')
+    with st.expander('Company coverage and data/order audit — counts are not accuracy'):
+        st.write('Strict overrides by company (counts, not company accuracy):')
+        st.json(evidence['company_strict_overrides'])
+        st.write('Reference status counts (not accuracy):')
+        st.json(evidence['reference_status_counts'])
+        st.write('Reversible order-copy checks; no new accuracy measured:')
+        st.json(evidence['order_copy'])
+        st.caption('The 60 forward pairs cover 12 unique targets; repeated route/deletion checks are not independent evaluation samples.')
+        st.json(evidence['source_hashes'])

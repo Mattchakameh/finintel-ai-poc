@@ -125,3 +125,89 @@ def test_decoder_missing_control_rejected(tmp_path):
     import pytest
     with pytest.raises(ValueError, match='paired decoder control'):
         load_revision(path)
+
+
+def test_robustness_rejects_unmatched_coverage_and_missing_controls():
+    import pytest
+
+    from src.meeting05_revision import validate_robustness
+    # Synthetic validation fixture, not reported scientific evidence.
+    evidence = {
+        'metric_columns': ['arm', 'control', 'strict_mean_pct', 'strict_seed_sd_pp', 'tie_credit_mean_pct'],
+        'common_acceptance': 106, 'common_fallback': 9,
+        'results': [[arm, control, 50.0, 1.0, 49.0]
+                    for arm in ('no_aux', 'row_column_cell_aux')
+                    for control in ('matched_uniform', 'matched_learned', 'matched_random')],
+        'originalD_modified_or_evaluated': False,
+    }
+    for key in ('model', 'cohort', 'random_control', 'strict_ties', 'independence',
+                'conclusion', 'scope_limit', 'source_hashes'):
+        evidence[key] = 'Synthetic test context'
+    validate_robustness(evidence)
+    evidence['common_acceptance'] = 41
+    with pytest.raises(ValueError, match='coverage'):
+        validate_robustness(evidence)
+    evidence['common_acceptance'] = 106
+    evidence['results'].pop()
+    with pytest.raises(ValueError, match='control'):
+        validate_robustness(evidence)
+
+
+def test_final_v4_robustness_is_prominent_and_preserves_history():
+    from streamlit.testing.v1 import AppTest
+    data = load_revision()
+    assert data['canonical_sha256'] == '77574b3cedb7854708ef3a8723206f7497b9ea2ba69ea23f7dea0d6f6cbe7db0'
+    assert data['public_manifest_sha256'] == 'b4d02d003a3f10cfe87d1ff13b733c2b92616ca8496e0298621ac8baebc1b438'
+    assert data['publication_status'] == 'STAGING_FINAL_MANIFEST_PENDING'
+    assert len(data['metrics']) == 52
+    evidence = data['final_robustness_audit']
+    assert evidence['originalD_modified_or_evaluated'] is False
+    assert evidence['feasibility']['confirmed_unused_eligible_cohort'] is False
+    app = AppTest.from_file(str(Path(__file__).resolve().parents[1] / 'app.py'), default_timeout=90).run()
+    app.sidebar.radio[0].set_value(app.sidebar.radio[0].options[3]).run()
+    assert not app.exception
+    assert any('Final robustness correction' in h.value for h in app.subheader)
+    assert any('no convincing learned grounding advantage' in w.value for w in app.warning)
+    app.radio(key='m05_period').set_value('Later Pilot — exploratory appendix').run()
+    assert not app.exception
+    headings = [h.value for h in app.subheader]
+    assert headings.index('Correction: matched-coverage numeric decoder controls') < headings.index('Earlier exploratory decoder history — unequal coverage')
+    assert any('superseded for attribution' in w.value for w in app.warning)
+
+
+def test_overnight_control_numerics_scope_and_render():
+    import pytest
+    from streamlit.testing.v1 import AppTest
+    evidence = load_revision()['post_M5_CONTROL_source_hybrid_v13']
+    expected = [(41.4035, 2.7320), (45.9649, 2.3700), (73.3333, 1.8190),
+                (67.8947, 2.2874), (34.9123, 2.2874)]
+    for row, values in zip(evidence['validation_results'], expected):
+        assert row['certified_Val114_mean_sd_percent'] == pytest.approx(values, abs=0.00005)
+    assert 'code_proof' not in evidence
+    assert evidence['reference_status_counts']['quarantined'] == 11
+    assert evidence['order_copy']['new_accuracy_measured'] is False
+    app = AppTest.from_file(str(Path(__file__).resolve().parents[1] / 'app.py'), default_timeout=90).run()
+    choices = app.sidebar.radio[0].options
+    assert all(f'{i:02}' in choice for i, choice in zip(range(2, 6), choices))
+    for choice in choices:
+        app.sidebar.radio[0].set_value(choice).run()
+        assert not app.exception
+    assert any('CONTROL SYSTEM' in h.value for h in app.subheader)
+    assert any('No neural-learning' in w.value for w in app.warning)
+    tables = [frame.value for frame in app.dataframe]
+    assert any(len(t) == 5 and 'Value accuracy (%)' in t for t in tables)
+    assert any('all Validation 115' in e.label for e in app.expander)
+
+
+def test_control_rejects_cohort_conflation_and_code():
+    import pytest
+
+    from src.meeting05_revision import validate_control
+    evidence = copy.deepcopy(load_revision()['post_M5_CONTROL_source_hybrid_v13'])
+    evidence['certified_counts']['Validation'] = 115
+    with pytest.raises(ValueError, match='cohort'):
+        validate_control(evidence)
+    evidence['certified_counts']['Validation'] = 114
+    evidence['code_proof'] = {}
+    with pytest.raises(ValueError, match='scope'):
+        validate_control(evidence)

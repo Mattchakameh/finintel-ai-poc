@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "revision": "M05_Advisor_Revision_2026-10-25_numeric_decoder_audit_v3",
-  "canonical_sha256": "b395a6dcb082603e9b3e29d55428f09e877e52bba67e82bd3e5e823a9b60715b",
-  "status": "EXPERIMENT_AND_REPORTING_UPDATES_COMPLETE_GENERALIZABLE_NEURAL_IMPROVEMENT_OPEN",
+  "revision": "M05_2026-10-25_v7_originalD_five_seed_private",
+  "canonical_sha256": "77574b3cedb7854708ef3a8723206f7497b9ea2ba69ea23f7dea0d6f6cbe7db0",
+  "status": "PRIVATE_MEETING5_REPORTING_ALIGNED_BOUNDED_SYSTEM_GAIN_SCIENTIFIC_OUTCOMES_OPEN",
   "metrics": [
     {
       "id": "historical_A_TEXT_ONLY_value_accuracy",
@@ -1089,7 +1089,7 @@
       "input_audit_status": "PARTIAL",
       "grouped_requirement": "meaningful_value_improvement",
       "current_status": "SCIENTIFIC_OUTCOME_OPEN",
-      "remaining_scope": "No demonstrated generalizable neural value-selection improvement. Reused-Validation hybrid is exploratory.",
+      "remaining_scope": "Limited posthoc CONTROL system gain under additional source information; desired independent neural value-selection improvement remains open.",
       "status": "OPEN"
     },
     {
@@ -1332,7 +1332,7 @@
     "R5_status": "MATCHED_VALIDATION_CONTROL_EVIDENCED",
     "R5_scope": "The requested year-rule comparison is fulfilled on the same Validation115: unique-year/otherwise-abstain rule104/115 versus temporal105/115. No new Test benchmark is required or planned. Historical temporal126/130 and fusion108/130 are separate archived observations; supplied-year features and stored tie/order confound limit interpretation."
   },
-  "local_integration_state": "PRIVATE_WORKING_WRITEBACK_AUTHORIZED_READBACK_RECEIPT_SEPARATE",
+  "local_integration_state": "FINAL_V4_CONTENT_PRIVATE_WRITEBACK_RECEIPT_SEPARATE",
   "post_M5_numeric_decoder_diagnostic": {
     "classification": "EXPLORATORY_NUMERIC_DECODER_SYSTEM_CHANGE_NOT_NEURAL_IMPROVEMENT",
     "cohort": "reused_corrected_Validation_115_post_M5",
@@ -1535,10 +1535,285 @@
     "new_training": false,
     "new_Test_evaluation": false,
     "scientific_outcome": "GENERALIZABLE_NEURAL_VALUE_IMPROVEMENT_OPEN",
-    "external_writeback": false
+    "external_writeback": false,
+    "interpretation_superseded_by": "final_robustness_audit: earlier unequal-fallback comparison is retained as history; it does not establish learned advantage."
   },
-  "publication_status": "PUBLICATION_AUTHORIZED",
-  "public_manifest_sha256": "438eb72b7ff9059dc81864509d1feddf331ca0f203441d228db4c165f4585d3f",
+  "final_robustness_audit": {
+    "status": "INDEPENDENT_READ_ONLY_AUDIT_PASSED_SCOPED",
+    "model": "task9 frozen-feature cell pilot plus task11 numeric decoder; NOT original Model D",
+    "cohort": "reused Validation115; four companies",
+    "metric_columns": [
+      "arm",
+      "control",
+      "strict_mean_pct",
+      "strict_seed_sd_pp",
+      "tie_credit_mean_pct"
+    ],
+    "results": [
+      [
+        "no_aux",
+        "matched_uniform",
+        60.0,
+        0.6148754619013485,
+        59.42028985507246
+      ],
+      [
+        "no_aux",
+        "matched_learned",
+        59.47826086956522,
+        3.111051099130141,
+        59.47826086956522
+      ],
+      [
+        "no_aux",
+        "matched_random",
+        59.678260869565214,
+        0.7213985576759987,
+        59.678260869565214
+      ],
+      [
+        "row_column_cell_aux",
+        "matched_uniform",
+        60.0,
+        0.6148754619013485,
+        59.42028985507246
+      ],
+      [
+        "row_column_cell_aux",
+        "matched_learned",
+        53.21739130434783,
+        2.250813757486047,
+        53.21739130434783
+      ],
+      [
+        "row_column_cell_aux",
+        "matched_random",
+        58.565217391304344,
+        0.5316095330711974,
+        58.565217391304344
+      ]
+    ],
+    "common_acceptance": 106,
+    "common_fallback": 9,
+    "random_control": "20 deterministic-seeded pseudorandom within-document weight permutations per target; same permutation bank across arms and seeds; all averaged, none selected",
+    "strict_ties": "Minimum SHA256(candidate_numeric_text), lexical secondary key; no duplicate candidate display texts found in658targets",
+    "independence": "115unique targets nested in4companies; five seeds and20permutations are repeated measurements, not independent evaluation samples",
+    "conclusion": "Prior48.52uniform vs59.48learned comparison used unequal acceptance/fallback coverage. Matched uniform60.00strict/59.42tie-credit and random59.68 provide no convincing learned grounding advantage. Auxiliary learned53.22 is below its matched controls. Generalizable neural improvement remains open.",
+    "order_checks": {
+      "actual_forward": "Train24 \u00d710checkpoints \u00d724permutations; tolerance1e-6; zero mapped argmax changes",
+      "maximum_absolute_logit_difference": 9.5367431640625e-07,
+      "downstream_cached_score_checks": 473760,
+      "mapped_choice_changes": 0,
+      "fractional_credit_changes": 0,
+      "random_decoder_all24_permutation_tested": false
+    },
+    "feasibility": {
+      "excluded_nonTest": 92,
+      "missing_grounding_and_candidates": 92,
+      "company_overlap": 62,
+      "company_year_overlap": 32,
+      "confirmed_unused_eligible_cohort": false
+    },
+    "scope_limit": "No untouched eligible nonTest cohort established within inspected archives; not a global nonexistence claim.92exclusions lack retained candidate mappings and were previously audited;27possible relocated HTML records are not adjudicated recovery.",
+    "external_writes": false,
+    "new_experiments_by_auditor": false,
+    "originalD_modified_or_evaluated": false,
+    "source_hashes": {
+      "robustness_audit/PROTOCOL.json": "45e6dfc9fd9617d2b9fec20076f90cab6d5690d52983a21883153c9c10c79b6d",
+      "robustness_audit/run_audit.py": "4ce2a8d397081fd741665f237e94ddc324319b7b11d5cb6cfde09fa716174a0e",
+      "robustness_audit/SUMMARY.json": "2462798ec765fc7d4206ab38fd4ad4b53913ac72741953da53d755a980fa5b89",
+      "robustness_audit/VALIDATION_RAW.json": "eba93e2887bd08d97491b97382973042a704f53d0dfd4908336cba1430179dde",
+      "robustness_audit/FORWARD_PERMUTATION.json": "d55e2eee0dcb839acc0473b2c59705d605c5c060f31b17813b1954deb85d220b",
+      "robustness_audit/DECODER_PERMUTATION.json": "83e80cf682776fb1075b05ce77e0ec384af53056a959a0c290ff3e49164180f1",
+      "feasibility_audit/FEASIBILITY_RESULTS.json": "82f5ec4317b513a7c61f344b8808be9781a92e928ad409af267e3a73b73765ce",
+      "feasibility_audit/audit_inventory.py": "9168b2bf71f6ceada85323defb538c0d944b0ea2dae76bfb5607cffbf3a5b01d"
+    },
+    "annotation_scope": "Final bounded PILOT controls; not original Model D. Source external_writes=false describes the read-only audit; private artifact delivery is recorded separately."
+  },
+  "public_delivery_state": "NO_NEW_PUBLIC_WRITES_AUTHORIZED",
+  "post_M5_CONTROL_source_hybrid_v13": {
+    "revision": "M05_2026-10-25_overnight_v6_CONTROL_source_hybrid_order_copy",
+    "model": "CandidateTileHead CONTROL, NOT original Model D",
+    "evaluation": "posthoc reused development; value-only; extra fullHTML/selected-cell unit metadata; no neural/H1/H2/generalization claim",
+    "seeds": [
+      11,
+      22,
+      33,
+      44,
+      55
+    ],
+    "validation_results": [
+      {
+        "arm": "baseline",
+        "all_Val115_mean_sd_percent": [
+          41.04347826086956,
+          2.7082454786778136
+        ],
+        "certified_Val114_mean_sd_percent": [
+          41.40350877192983,
+          2.732002017964463
+        ],
+        "overrides_per_seed": 0,
+        "rescues_mean": 0,
+        "regressions_mean": 0
+      },
+      {
+        "arm": "number_only",
+        "all_Val115_mean_sd_percent": [
+          45.565217391304344,
+          2.349435841061966
+        ],
+        "certified_Val114_mean_sd_percent": [
+          45.96491228070175,
+          2.370044927387068
+        ],
+        "overrides_per_seed": 10,
+        "rescues_mean": 5.2,
+        "regressions_mean": 0
+      },
+      {
+        "arm": "row_period",
+        "all_Val115_mean_sd_percent": [
+          72.69565217391303,
+          1.8031688133328436
+        ],
+        "certified_Val114_mean_sd_percent": [
+          73.33333333333333,
+          1.8189860836252385
+        ],
+        "overrides_per_seed": 60,
+        "rescues_mean": 36.4,
+        "regressions_mean": 0
+      },
+      {
+        "arm": "strict_scope_unit",
+        "all_Val115_mean_sd_percent": [
+          67.30434782608697,
+          2.2675486626791836
+        ],
+        "certified_Val114_mean_sd_percent": [
+          67.89473684210526,
+          2.28743944042198
+        ],
+        "overrides_per_seed": 50,
+        "rescues_mean": 30.2,
+        "regressions_mean": 0
+      },
+      {
+        "arm": "random_override",
+        "all_Val115_mean_sd_percent": [
+          34.608695652173914,
+          2.267548662679181
+        ],
+        "certified_Val114_mean_sd_percent": [
+          34.91228070175439,
+          2.287439440421982
+        ],
+        "overrides_per_seed": 50,
+        "rescues_mean": 8.08,
+        "regressions_mean": 15.48
+      }
+    ],
+    "paired_gain_pp": {
+      "strict_all115": [
+        26.260869565217394,
+        1.428841454361302
+      ],
+      "strict_certified114": [
+        26.491228070175442,
+        1.4413751513293822
+      ],
+      "row_period_all115": [
+        31.652173913043477,
+        1.8031688133328443
+      ],
+      "row_period_certified114": [
+        31.929824561403507,
+        1.8189860836252365
+      ]
+    },
+    "certified_counts": {
+      "Train": 469,
+      "Validation": 114
+    },
+    "all_counts": {
+      "Train": 543,
+      "Validation": 115
+    },
+    "common_override": {
+      "Train": 77,
+      "Validation": 8,
+      "all_three_source_arms_percent": 100,
+      "strict_advantage_established": false
+    },
+    "company_strict_overrides": {
+      "CSCO": 5,
+      "DUK": 0,
+      "HD": 20,
+      "META": 25
+    },
+    "visible_only_Validation_overrides": 0,
+    "reference_status_counts": {
+      "reference_valid": 475,
+      "source_certified_primary_scope": 108,
+      "reference_scope_unverified": 37,
+      "quarantined": 11,
+      "source_certified_separate_scope_class": 26,
+      "reference_unverified": 1
+    },
+    "order_copy": {
+      "targets": 658,
+      "candidates": 2632,
+      "actual_forward_pairs": 60,
+      "forward_unique_targets": 12,
+      "logged_max_difference": 0,
+      "route_checks": 3948,
+      "deletion_checks": 3948,
+      "nonzero_fixture_unique_targets": 3,
+      "new_accuracy_measured": false
+    },
+    "limits": [
+      "Repeatedly reused four-company Validation; no independent confirmation",
+      "Additional source information, not same-input neural gain",
+      "Revenue strata not tax-equivalent; bank-net/other-income excluded from primary certified mask",
+      "All11 quarantines remain; five value/candidate patches UNAPPLIED",
+      "Original image mapping retained; recovered HTML not repaired original pixels",
+      "Data package is not all900cleaned or training-ready",
+      "Original D not evaluated; original Test130 metrics unchanged",
+      "v14 is a reversible copy; original candidate order and labels unchanged"
+    ],
+    "source_hashes": {
+      "v13_summary": "a8558d8400d2e26fa545bbde660d0ba6b03f71ca13cf8bf2b53debc33d12092d",
+      "v10_ledger": "cc829ce5bf71b9078b3950ba9965043cd4a0927bfd47f7dfe88f873c85ff7907",
+      "v14_audit": "abb40e448c52a76d839fb14550d029e251ecf10fcdf44dd47026f17b904b0ec5",
+      "v14_copy_freeze": "5bf3b8f610d1ca528f226636a923e934da1d92a88369fb4c8ae293e08f97c17c"
+    }
+  },
+  "current_model_identity_annotations": {
+    "corrected_neural": "CandidateTileHead CONTROL; 41.04347826086956% reused corrected Val115; not original ModelD",
+    "original_D": "Historical Test130 metrics and gate audit preserved unchanged",
+    "prior_52_numeric_records": "Unchanged, including negative history. New CONTROL module is separate."
+  },
+  "post_M5_original_D_five_seed_v25": {
+    "revision": "M05_2026-10-25_v7_originalD_five_seed_private",
+    "identity": "Original D five-seed frozen reconstruction plus source-assisted deterministic wrapper",
+    "evidence_type": "ACTUALLY_EXECUTED_LOCAL_SAVED_RESULTS; reporting integration executes no models",
+    "model_seeds": [
+      11,
+      22,
+      33,
+      44,
+      55
+    ],
+    "source_hashes": {
+      "v25_package_manifest": "7582c67ad448690385f675369c822d330d4f0a24efb79959a84b00c500c45c0f",
+      "v25_aggregate": "68c3e490c4ec1bee0c14502d55e719f6580a8eeeac5a3e6ca242187d86644ca4",
+      "v25_paired": "81433a79504ee8ad8c38a62f58a7e019a871fa97e4e70e9eb396c2086b4bbe1b",
+      "independent_audit": "f61852f00bbdba439644dc602faf3a620a09ae40290b4521630e455cd5ca3556"
+    }
+  },
+  "publication_status": "STAGING_FINAL_MANIFEST_PENDING",
+  "public_manifest_sha256": "b4d02d003a3f10cfe87d1ff13b733c2b92616ca8496e0298621ac8baebc1b438",
   "requirements": [
     {
       "id": "chance_context",
@@ -1549,8 +1824,8 @@
     {
       "id": "meaningful_value_improvement",
       "status": "OPEN",
-      "review_state": "SCIENTIFIC_OUTCOME_OPEN",
-      "scope": "No demonstrated generalizable neural value-selection improvement. Reused-Validation hybrid is exploratory."
+      "review_state": "LIMITED_POSTHOC_SYSTEM_GAIN_NEURAL_OUTCOME_OPEN",
+      "scope": "CONTROL plus additional HTML/unit source information improves reused-development value agreement; independent generalizable neural improvement and scientific hypotheses remain unproved."
     },
     {
       "id": "candidate_generation",
@@ -1639,9 +1914,9 @@
     {
       "id": "synchronization",
       "status": "PARTIAL",
-      "review_state": "LOCAL_ANNOTATION_READY_EXTERNAL_WRITES_PAUSED",
-      "scope": "Earlier private reporting revision uploaded and byte-verified; this historical annotation is local-only. Parent coordinates later report/deck integration."
+      "review_state": "PRIVATE_SCIENTIFIC_CONTENT_FROZEN_DELIVERY_SEPARATE",
+      "scope": "Working notebook/report/tracker/Python and data documentation aligned; exact private delivery receipts stored separately. Deck/dashboard separately owned; no public publication authorized."
     }
   ],
-  "requirements_note": "MET denotes a completed scoped experiment or reporting correction, including negative results; it does not mean scientific success. PARTIAL distinguishes completed progress reporting from open completion or explanation. Reporting completion does not establish generalizable neural improvement."
+  "requirements_note": "MET denotes a completed scoped experiment or reporting correction, including negative results; it does not mean scientific success. PARTIAL distinguishes completed progress reporting from open completion or explanation. Publication remains on hold."
 }

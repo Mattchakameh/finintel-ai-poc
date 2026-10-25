@@ -14,13 +14,28 @@ def stage(source, destination):
     historical = data.get('historical_temporal_interpretation', {})
     if historical:
         historical['sources'] = [{k: row[k] for k in ('name', 'sha256', 'bytes')} for row in historical['sources']]
+    replay = data.get('post_M5_original_D_five_seed_v25')
+    if replay:
+        data['post_M5_original_D_five_seed_v25'] = {k: replay[k] for k in
+            ('revision', 'identity', 'evidence_type', 'model_seeds', 'source_hashes')}
+    hybrid = data.get('post_M5_CONTROL_source_hybrid_v13')
+    if hybrid:
+        # Public dashboard receives aggregate research evidence, never source code.
+        allowed = {'revision', 'model', 'evaluation', 'seeds', 'validation_results',
+                   'paired_gain_pp', 'certified_counts', 'all_counts', 'common_override',
+                   'company_strict_overrides', 'visible_only_Validation_overrides',
+                   'reference_status_counts', 'order_copy', 'limits', 'source_hashes'}
+        data['post_M5_CONTROL_source_hybrid_v13'] = {k: v for k, v in hybrid.items() if k in allowed}
     data['schema_version'] = 1
     data['publication_status'] = 'STAGING_FINAL_MANIFEST_PENDING'
     data['public_manifest_sha256'] = hashlib.sha256(raw).hexdigest()
     status_map = {
+        'LIMITED_POSTHOC_SYSTEM_GAIN_NEURAL_OUTCOME_OPEN': 'OPEN',
+        'PRIVATE_SCIENTIFIC_CONTENT_FROZEN_DELIVERY_SEPARATE': 'PARTIAL',
         'REPORTING_CORRECTED': 'MET',
         'MATCHED_VALIDATION_CONTROL_EVIDENCED': 'MET',
         'LOCAL_ANNOTATION_READY_EXTERNAL_WRITES_PAUSED': 'PARTIAL',
+        'PRIVATE_WORKING_PACKAGE_FINALIZED_DECK_DASHBOARD_SEPARATE': 'PARTIAL',
         'SCIENTIFIC_OUTCOME_OPEN': 'OPEN',
         'DOCUMENTED_WITH_LIMITATIONS': 'MET',
         'SCOPED_IMPLEMENTATION_ONLY': 'MET',

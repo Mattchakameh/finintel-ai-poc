@@ -1,7 +1,12 @@
 """Meeting 05 presentation only: no training, remote writes or private artifact copies."""
+import json
+import os
+from pathlib import Path
+
 import pandas as pd
 import streamlit as st
 
+from src.meeting05_five_seed import render_five_seed
 from src.meeting05_loader import Meeting05EvidenceError, load_meeting05
 from src.meeting05_revision import load_revision, render_revision
 
@@ -19,23 +24,24 @@ def render_meeting05():
     st.subheader('Financial Grounding: Audit, Repairs & Controlled Diagnostics')
     st.caption('Archived research evidence as of ' + summary['as_of'] + '. This dashboard does not train models or change the source notebooks.')
     st.warning('No demonstrated general neural accuracy improvement. Hybrid rules and structured-source extraction are different information regimes, not neural gains.')
-    overview, results, models, tracker, evidence = st.tabs([
-        'Research Overview', 'Cohort-Specific Results', 'Models & Inputs',
-        'Requirement Evidence', 'Provenance & Artifacts',
+    overview, results, methods = st.tabs([
+        'Research Overview', 'Cohort-Specific Results', 'Methods, Requirements & Evidence',
     ])
     with overview:
-        render_revision(revision, 'overview')
-        st.markdown('### What improved — and what did not')
-        st.markdown('''
+        render_five_seed()
+        with st.expander('Historical evidence and earlier CONTROL diagnostics'):
+            render_revision(revision, 'overview')
+            st.markdown('### What improved — and what did not')
+            st.markdown('''
 - **Evidence reliability:** source alignment, fiscal references, period provenance and table selection were audited and repaired in separate copies.
 - **Corrected 115-target replay:** frozen neural **41.04%**; numeric-rule + neural fallback **53.57%**. Exploratory hybrid benefit, not new neural weights.
 - **New challenges remain difficult:** annual/quarter **19.00%** on 20 queries; similar-concept text head **39.25% → 37.25%** on 80 queries after input repair.
 - **Structured source extraction:** **104/105** correct after HTML/XBRL cell/header repair on the eligible cohort. This adds source information and is **not 99% neural performance**.
 ''')
-        st.info('Financial grounding means linking a value to the correct company, concept, period, unit and source evidence — not just recognizing a number.')
-        st.markdown('### Research boundary')
-        st.write('No new Test evaluation. Reused Validation, answer-assisted historical evidence windows, small correlated challenges and provided source catalogs limit generalization. Completion of scoped deliverables does not confirm the hypotheses.')
-        st.caption('Simple year matching (104/115) and temporal grounding (105/115) used candidate-period metadata on historical Validation; neither is deployment extraction accuracy.')
+            st.info('Financial grounding means linking a value to the correct company, concept, period, unit and source evidence — not just recognizing a number.')
+            st.markdown('### Research boundary')
+            st.write('No new Test evaluation. Reused Validation, answer-assisted historical evidence windows, small correlated challenges and provided source catalogs limit generalization. Completion of scoped deliverables does not confirm the hypotheses.')
+            st.caption('Simple year matching (104/115) and temporal grounding (105/115) used candidate-period metadata on historical Validation; neither is deployment extraction accuracy.')
     with results:
         render_revision(revision, 'results')
         st.info('Select one matched cohort at a time. These results must not be pooled into a single leaderboard.')
@@ -49,20 +55,49 @@ def render_meeting05():
         st.dataframe(frame, hide_index=True, use_container_width=True)
         st.bar_chart(frame.set_index('Method'))
         st.warning(result['limit'])
-    with models:
+    with methods:
         render_revision(revision, 'models')
         st.dataframe(pd.DataFrame(summary['models']), hide_index=True, use_container_width=True)
         st.info('A/B/C/D are all neural configurations. B is text plus table, not image-only. Original D uses sigmoid gated fusion, not cross-attention. Five seeds are repeated runs, not five architectures.')
         st.write('The Meeting 05 CandidateTileHead has its own implementation and fresh CONTROL/WRONG_ROW heads. It does not load original Model D weights. Whole-image T=1 attention has one valid token, so attention weight is necessarily 1 and does not prove learned spatial selection.')
         st.caption('Source-verified against original training classes and M05 candidate_tile_head.py / training_driver.py. Earlier meeting pages remain historical snapshots.')
-    with tracker:
+        st.divider()
         render_revision(revision, 'tracker')
-    with evidence:
+        st.divider()
         render_revision(revision, 'provenance')
         st.warning('Linked Drive artifacts retain their existing owner-only / authorized access. This app does not grant access, copy private notebooks or broaden sharing. Artifact revision and publication are coordinated separately; no deck/page count is asserted here.')
-        for title, url in summary['links'].items():
-            st.markdown(f'[{title}]({url})')
-        st.caption('Safe notebook: historical executable cells are archived; visible history is non-executable. Run All only inspects the review archive, not the original training workflow.')
-        with st.expander('Snapshot provenance and SHA-256 digests'):
-            st.dataframe(pd.DataFrame(summary['provenance']), hide_index=True, use_container_width=True)
+        private_resources = os.environ.get('M05_PRIVATE_RESOURCES')
+        if private_resources:
+            resources = json.loads(Path(private_resources).read_text())
+            st.subheader('PowerPoint, Final Report & Notebook')
+            for resource in resources['resources']:
+                if not resource.get('visible', True):
+                    continue
+                st.markdown(f"[{resource['name']}]({resource['url']})")
+                st.caption(resource['status'])
+            with st.expander('Resource verification'):
+                for resource in resources['resources']:
+                    if resource.get('visible', True):
+                        st.caption(resource['name'] + ' — SHA-256: ' + resource['sha256'])
+            st.caption('Verified private resources; existing access permissions apply.')
+        else:
+            st.subheader('PowerPoint, Final Report & Notebook')
+            st.markdown('**PowerPoint — 51 slides** · Private access\n\n**Final Report** · Private access\n\n**Notebook** · Private access')
+            st.info('These resources remain private. Public links and downloads are not included here.')
+        st.caption('Earlier delivery records remain in the archived snapshot; they do not describe the current resource versions.')
+        st.caption('Notebook execution behavior depends on its version. Current private notebook resources include historical material; Colab runtime has not been tested. Saved research results here are displayed without running models.')
+        with st.expander('Run provenance and SHA-256 digests'):
+            source_labels = {
+                'm05_dot_integration/M05_dot_22_item_tracker.json': 'Requirement tracker execution record',
+                'm05_dot_integration/M05_dot_PROGRESS_REPORT.md': 'Progress report execution record',
+                'm05_dot_period/full_multimodal_summary.json': 'Period challenge execution record',
+                'm05_dot_item17/results/primary_text_scorer_summary.json': 'Concept challenge initial execution record',
+                'm05_dot_item17/results/v2_text_scorer_summary.json': 'Concept challenge revised execution record',
+                'm05_dot_item17/results/structured_parser_summary.json': 'Structured parser execution record',
+                'm05_dot_evidence/paired_repair/results/paired_summary.json': 'Paired repair execution record',
+            }
+            provenance = [{'Execution record': source_labels.get(row['source'], row['source']),
+                           'SHA-256': row['sha256']} for row in summary['provenance']]
+            st.dataframe(pd.DataFrame(provenance), hide_index=True, use_container_width=True)
+            st.caption('Neutral display labels map to preserved source records. Original filenames, audit history, hashes and methodological provenance remain unchanged.')
         st.caption('Compact summaries only. Full private source artifacts are not bundled. No reported performance is recomputed by this display layer.')
