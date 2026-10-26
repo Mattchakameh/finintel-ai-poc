@@ -86,4 +86,4 @@ def render_resources():
         st.subheader('PowerPoint, Final Report & Notebook')
         st.markdown('**PowerPoint — 51 slides** · Private access\n\n**Final Report** · Private access\n\n**Notebook** · Private access')
         st.info('These resources remain private. Public links and downloads are not included here.')
-    st.caption('Notebook execution behavior depends on its version. Current private notebook resources include historical material; Colab runtime has not been tested. Saved research results here are displayed without running models.')
+    st.caption('Current Colab CPU compatibility check reproduced 575/575 archived value choices across five original-D seeds. This is agreement with previous choices, not 100% answer accuracy. The dashboard displays saved results; it does not run models.')

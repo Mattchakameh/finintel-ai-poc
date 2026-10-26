@@ -133,18 +133,20 @@ def render_revision(data, section):
         st.caption('Complete means the scoped experiment or reporting requirement is fulfilled, including negative results. Partial and Open identify remaining work; completion does not imply scientific success.')
         from src.meeting05_priorities import PRIORITIES, private_priority_links
         st.subheader('Five professor priorities')
-        st.caption('Internal items organize the evidence under each professor priority; they are not additional professor requests.')
+        st.caption('The 22 internal items organize the work; they are not 22 professor requests. Experiment evidence is grouped under the five priorities below.')
         by_id = {r['id']: r for r in data['advisor_atom_crosswalk']}
         private_links = private_priority_links()
         for priority in PRIORITIES:
             with st.expander(f"Professor priority {priority['number']} — {priority['title']}"):
-                st.caption('Internal items: ' + priority['items'] + '. Slide references: ' + priority['slides'] + '.')
+                st.markdown('**Question:** ' + priority['question'])
+                st.markdown('**Answer:** ' + priority['answer'])
+                st.caption('Evidence — internal items: ' + priority['items'] + '.')
                 rows = []
                 for identifier, item, slides in priority['rows']:
                     r = by_id[identifier]
                     rows.append({'Internal item': item, 'Requirement': r['requirement'],
                                  'Current status': requirement_status(identifier, r['status']),
-                                 'Evidence and limits': requirement_evidence(r), 'Slides': slides})
+                                 'Evidence and limits': requirement_evidence(r)})
                 st.dataframe(pd.DataFrame(rows), hide_index=True)
                 st.caption(priority['note'])
                 if str(priority['number']) in private_links:

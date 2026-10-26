@@ -73,4 +73,6 @@ def render_five_seed():
         st.caption('Visible-only wrappers make no overrides. Concept logits remain unchanged. Historical Test130 and CandidateTileHead CONTROL use different conditions and remain separate below.')
         st.info('New-data inventory: 225 compatible facts; 0 benchmark-ready examples. Counts are not accuracy or evidence of training readiness.')
     with st.expander('Replay verification'):
+        st.write('Verified current-environment Colab CPU compatibility: five original-D seeds reproduced 575/575 archived value choices, not 100% accuracy. Deterministic frozen-wrapper evaluation on the new logits reproduced checked-source 114 agreement of 62.8070% ± 2.6022 percentage points.')
+        st.caption('PyTorch 2.11 CPU differs from the original 2.14.1 environment. No bitwise-logit equivalence is claimed. No training, new data or protected Test evaluation was performed; this check establishes compatibility and reproduction, not new scientific performance.')
         st.write('Independent saved-output audit accepted all 575 baseline choices and 10,350 wrapper rows. Choice parity does not establish bitwise-logit or historical-concept parity; the exact historical model revision is unrecorded.')

@@ -83,3 +83,17 @@ def test_integrated_overview_keeps_current_history_and_pilot_distinct():
     assert not app.exception
     assert any('Later pilot — exploratory system diagnostics' == h.value for h in app.subheader)
     assert not app.get('json')
+
+
+def test_compatibility_receipt_is_not_accuracy_or_new_training():
+    app = AppTest.from_file(str(Path(__file__).resolve().parents[1] / 'app.py'), default_timeout=90).run()
+    app.sidebar.radio[0].set_value(app.sidebar.radio[0].options[3]).run()
+    assert not app.exception
+    text = ' '.join(x.value for x in list(app.markdown) + list(app.caption))
+    assert '575/575 archived value choices, not 100% accuracy' in text
+    assert '62.8070% ± 2.6022' in text
+    assert 'No bitwise-logit equivalence' in text
+    assert 'Colab runtime has not been tested' not in text
+    from src.meeting05_priorities import PRIORITIES
+    assert len(PRIORITIES) == 5
+    assert all(p['question'].endswith('?') and p['answer'] for p in PRIORITIES)
