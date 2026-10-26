@@ -131,11 +131,25 @@ def render_revision(data, section):
         st.warning('Gate weights are not causal modality importance; these are original D diagnostics, not CandidateTileHead weights.')
     elif section == 'tracker':
         st.caption('Complete means the scoped experiment or reporting requirement is fulfilled, including negative results. Partial and Open identify remaining work; completion does not imply scientific success.')
-        st.subheader('Experiment and reporting requirements')
-        st.dataframe(pd.DataFrame([{'Requirement': r['requirement'], 'Current status': requirement_status(r['id'], r['status']), 'Evidence and limits': requirement_evidence(r)} for r in data['advisor_atom_crosswalk'] if r['id'] not in {'R20', 'R21'}]), hide_index=True)
+        from src.meeting05_priorities import PRIORITIES, private_priority_links
+        st.subheader('Five professor priorities')
+        st.caption('Internal items organize the evidence under each professor priority; they are not additional professor requests.')
+        by_id = {r['id']: r for r in data['advisor_atom_crosswalk']}
+        private_links = private_priority_links()
+        for priority in PRIORITIES:
+            with st.expander(f"Professor priority {priority['number']} — {priority['title']}"):
+                st.caption('Internal items: ' + priority['items'] + '. Slide references: ' + priority['slides'] + '.')
+                rows = []
+                for identifier, item, slides in priority['rows']:
+                    r = by_id[identifier]
+                    rows.append({'Internal item': item, 'Requirement': r['requirement'],
+                                 'Current status': requirement_status(identifier, r['status']),
+                                 'Evidence and limits': requirement_evidence(r), 'Slides': slides})
+                st.dataframe(pd.DataFrame(rows), hide_index=True)
+                st.caption(priority['note'])
+                if str(priority['number']) in private_links:
+                    st.markdown(f"[Open this priority in the canonical notebook]({private_links[str(priority['number'])]})")
         st.caption('Current status describes the scoped requirement. Completed reporting does not establish scientific improvement; historical input-audit ratings are retained in the underlying evidence.')
-        with st.expander('Grouped research status summary'):
-            st.dataframe(pd.DataFrame([{'Requirement': r['id'].replace('_', ' '), 'Current status': requirement_status(r['id'], r['status']), 'Evidence and limits': r['scope']} for r in data['requirements'] if r['id'] != 'literature_review']), hide_index=True)
         render_power_planning(data)
 
 

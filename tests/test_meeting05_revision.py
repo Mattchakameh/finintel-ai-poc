@@ -227,9 +227,18 @@ def test_plain_progress_power_and_current_reporting_status():
     assert dict(power.values)['Variance (squared percentage points)'] == '709.3858'
     assert any('816' in x.value and 'conditional planning' in x.value for x in app.markdown)
     assert any('650 seed-target rows are not independent' in x.value for x in app.warning)
-    requirements = next(t for t in tables if 'Requirement' in t and 'Main mean±SD table' in t['Requirement'].values)
-    statuses = dict(zip(requirements['Requirement'], requirements['Current status']))
+    statuses = {row['Requirement']: row['Current status'] for table in tables if 'Requirement' in table for _, row in table.iterrows()}
     assert statuses['Main mean±SD table'] == 'Complete'
     assert statuses['Improve correct value selection'] == 'System improvement demonstrated; learned-model improvement remains open'
     assert statuses['Revisit power after above-chance progress'] == 'Conditional follow-up — not recalculated'
     assert not any('Run provenance' in e.label for e in app.expander)
+
+
+def test_five_priorities_cover_experiment_items_without_new_priorities():
+    from src.meeting05_priorities import PRIORITIES
+    assert [p['number'] for p in PRIORITIES] == [1, 2, 3, 4, 5]
+    ids = [r[0] for p in PRIORITIES for r in p['rows']]
+    assert len(ids) == 19 and set(ids) == {f'R{i}' for i in range(1, 20)}
+    assert '12' in PRIORITIES[0]['items'] and '12' in PRIORITIES[2]['items']
+    assert 'historical 29' in PRIORITIES[3]['rows'][2][2]
+    assert 'new 20 Validation' in PRIORITIES[3]['rows'][2][2]
