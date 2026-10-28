@@ -26,20 +26,24 @@ def test_consolidated_tabs_and_replay_views():
         assert not app.exception
     assert [t.label for t in app.tabs] == ['Research Overview', 'Cohort-Specific Results', 'Methods, Requirements & Evidence']
     assert any('28.42%' in m.value and '62.81%' in m.value for m in app.markdown)
-    assert any('Public links and downloads are not included' in i.value for i in app.info)
+    assert not any('PowerPoint' in h.value or 'Final Report' in h.value for h in app.subheader)
     for cohort in ['certified114_system_yield', 'all115_legacy', 'certified_candidate_available113']:
         app.selectbox(key='m05_d_replay_cohort').select(cohort).run()
         assert not app.exception
 
 
-def test_private_resources_only_when_explicitly_configured(monkeypatch, tmp_path):
+def test_removed_resources_stay_hidden_even_with_private_configuration(monkeypatch, tmp_path):
     path = tmp_path / 'resources.json'
     path.write_text(json.dumps({'resources': [{'name': 'Portable notebook', 'url': 'https://example.invalid/private', 'status': 'Colab runtime untested', 'sha256': 'a' * 64}], 'slides_status': 'Slides pending final hashes'}))
     monkeypatch.setenv('M05_PRIVATE_RESOURCES', str(path))
     app = AppTest.from_file(str(Path(__file__).resolve().parents[1] / 'app.py'), default_timeout=90).run()
     app.sidebar.radio[0].set_value(app.sidebar.radio[0].options[3]).run()
     assert not app.exception
-    assert any('Colab runtime untested' in c.value for c in app.caption)
+    text = ' '.join(x.value for x in list(app.markdown) + list(app.caption))
+    assert 'example.invalid/private' not in text
+    assert 'Colab runtime untested' not in text
+    assert 'Private access' not in text
+    assert any('Evidence and limits:' in m.value for m in app.markdown)
 
 
 def test_neutral_labels_preserve_source_records():

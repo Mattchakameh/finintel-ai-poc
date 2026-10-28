@@ -227,7 +227,9 @@ def test_plain_progress_power_and_current_reporting_status():
     assert dict(power.values)['Variance (squared percentage points)'] == '709.3858'
     assert any('816' in x.value and 'conditional planning' in x.value for x in app.markdown)
     assert any('650 seed-target rows are not independent' in x.value for x in app.warning)
-    statuses = {row['Requirement']: row['Current status'] for table in tables if 'Requirement' in table for _, row in table.iterrows()}
+    text_blocks = [m.value for m in app.markdown]
+    statuses = {text.split(' · ', 1)[1].removesuffix('**'): text_blocks[i + 1].removeprefix('Status: ')
+                for i, text in enumerate(text_blocks) if text.startswith('**Item ')}
     assert statuses['Main mean±SD table'] == 'Complete'
     assert statuses['Improve correct value selection'] == 'System improvement demonstrated; learned-model improvement remains open'
     assert statuses['Revisit power after above-chance progress'] == 'Conditional follow-up — not recalculated'

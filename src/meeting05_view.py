@@ -1,8 +1,4 @@
 """Meeting 05 presentation only: no training, remote writes or private artifact copies."""
-import json
-import os
-from pathlib import Path
-
 import pandas as pd
 import streamlit as st
 
@@ -30,7 +26,7 @@ def render_meeting05():
         st.subheader('What is done — and what remains')
         st.markdown('**Done:** five-seed comparison and source checks; mean ± SD reporting; documented experiments and limitations.\n\n**Still open:** improvement in the learned model itself, evaluation on genuinely new examples, and a new company-aware power calculation. The approximately 816-target figure is conditional historical planning.')
         st.caption('New-data inventory: 225 compatible facts; 0 benchmark-ready examples. This is not a claim that the data is ready for training.')
-        render_resources()
+        st.caption('This dashboard presents saved research results; it does not run predictions or train models.')
         with st.expander('Historical A–D comparison (Meeting4) and earlier diagnostics'):
             render_revision(revision, 'overview')
             st.markdown('### What improved — and what did not')
@@ -45,6 +41,8 @@ def render_meeting05():
             st.write('No new Test evaluation. Reused Validation, answer-assisted historical evidence windows, small correlated challenges and provided source catalogs limit generalization. Completion of scoped deliverables does not confirm the hypotheses.')
             st.caption('Simple year matching (104/115) and temporal grounding (105/115) used candidate-period metadata on historical Validation; neither is deployment extraction accuracy.')
     with results:
+        st.subheader('Compare like with like')
+        st.markdown('**Start with the current result:** Research Overview shows the 114-example comparison. **Explore below:** choose an evidence period and one evaluation set to inspect earlier diagnostics or the exploratory pilot.')
         st.info('Additional and historical evaluations use different examples or methods. Start with Research Overview for the current 114-example comparison.')
         with st.expander('Explore separate cohorts and earlier experiments'):
             render_revision(revision, 'results')
@@ -60,6 +58,7 @@ def render_meeting05():
             st.bar_chart(frame.set_index('Method'))
             st.warning(result['limit'])
     with methods:
+        st.caption('Open a professor priority to read the question, short answer and supporting evidence. Model details and historical power assumptions are available separately.')
         with st.expander('Technical model inputs and gate diagnostics'):
             render_revision(revision, 'models')
             st.dataframe(pd.DataFrame(summary['models']), hide_index=True, use_container_width=True)
@@ -69,21 +68,3 @@ def render_meeting05():
         st.divider()
         render_revision(revision, 'tracker')
         st.divider()
-
-
-def render_resources():
-    private_resources = os.environ.get('M05_PRIVATE_RESOURCES')
-    if private_resources:
-        resources = json.loads(Path(private_resources).read_text())
-        st.subheader('PowerPoint, Final Report & Notebook')
-        for resource in resources['resources']:
-            if not resource.get('visible', True):
-                continue
-            st.markdown(f"[{resource['name']}]({resource['url']})")
-            st.caption(resource['status'])
-        st.caption('Verified private resources; existing access permissions apply.')
-    else:
-        st.subheader('PowerPoint, Final Report & Notebook')
-        st.markdown('**PowerPoint — 51 slides** · Private access\n\n**Final Report** · Private access\n\n**Notebook** · Private access')
-        st.info('These resources remain private. Public links and downloads are not included here.')
-    st.caption('Current Colab CPU compatibility check reproduced 575/575 archived value choices across five original-D seeds. This is agreement with previous choices, not 100% answer accuracy. The dashboard displays saved results; it does not run models.')

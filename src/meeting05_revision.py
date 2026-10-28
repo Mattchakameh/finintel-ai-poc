@@ -141,13 +141,11 @@ def render_revision(data, section):
                 st.markdown('**Question:** ' + priority['question'])
                 st.markdown('**Answer:** ' + priority['answer'])
                 st.caption('Evidence — internal items: ' + priority['items'] + '.')
-                rows = []
                 for identifier, item, slides in priority['rows']:
                     r = by_id[identifier]
-                    rows.append({'Internal item': item, 'Requirement': r['requirement'],
-                                 'Current status': requirement_status(identifier, r['status']),
-                                 'Evidence and limits': requirement_evidence(r)})
-                st.dataframe(pd.DataFrame(rows), hide_index=True)
+                    st.markdown(f"**Item {item} · {r['requirement']}**")
+                    st.write('Status: ' + requirement_status(identifier, r['status']))
+                    st.write('Evidence and limits: ' + requirement_evidence(r))
                 st.caption(priority['note'])
                 if str(priority['number']) in private_links:
                     st.markdown(f"[Open this priority in the canonical notebook]({private_links[str(priority['number'])]})")
