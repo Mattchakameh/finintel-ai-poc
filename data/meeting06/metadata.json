@@ -1,0 +1,46 @@
+{
+  "schema_version": 2,
+  "snapshot_date": "2026-11-12",
+  "source_repo": "https://github.com/Mattchakameh/finintel-ai-poc",
+  "source_branch": "meeting05-dashboard",
+  "source_commit": "8599faca034f266121e7b497dc576a4f68a975de",
+  "notebook_sha256": "6632cfa03dde3f0868642c45c06406db015cc19a783e21e59fdb8ea6854d0c14",
+  "model": "Qwen/Qwen3-VL-8B-Instruct",
+  "revision": "0c351dd01ed87e9c1b53cbc748cba10e6187ff3b",
+  "raw_archive_verified_order_seeds": [
+    11
+  ],
+  "saved_log_verified_order_seeds": [
+    11,
+    22,
+    33,
+    44,
+    55
+  ],
+  "qwen_status": "COMPLETED_SAVED_LOGS_VERIFIED",
+  "bcd_status": "COMPLETED_ARCHIVE_AUDITED",
+  "bcd": {
+    "train": 537,
+    "validation": 96,
+    "held_validation": 19,
+    "A": "Not trained: no verified narrative-only supervision.",
+    "B": "Narrative + question/candidate table-text embeddings; no image.",
+    "C": "Same text + identical local/row/global ViT views using concatenation.",
+    "D": "Same text and images, with attention over the three visual views and a learned sigmoid gate.",
+    "parameters": {
+      "B": 152321,
+      "C": 211329,
+      "D": 227969
+    },
+    "seed": 20261031,
+    "epochs": 5
+  },
+  "boundaries": [
+    "All original splits were previously exposed. Historical Test is not an untouched holdout.",
+    "Five seeds vary option presentation, not model training; the same 788 questions are repeated.",
+    "Original labels and known source/period/scope defects are retained. No answer correction or numeric-rule fallback.",
+    "Native and reduced-image arms are not compute matched. Both use the same Qwen processor bounds; reduced images may be upsampled.",
+    "Saved responses were checked, not regenerated. Full prompt/grid/token/runtime archive audit is verified only for order seed 11.",
+    "Qwen results do not establish a gain for the FinBERT/ViT model or a causal advantage of fusion."
+  ]
+}

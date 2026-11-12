@@ -1,0 +1,137 @@
+{
+  "same_settings_repeated_without_tuning": true,
+  "fresh_results": {
+    "baseline": {
+      "Train": {
+        "correct": 468,
+        "denominator": 537,
+        "mean_ce": 0.3863918569536818,
+        "same_row_other_printed_year_errors": 44
+      },
+      "Validation": {
+        "correct": 56,
+        "denominator": 96,
+        "mean_ce": 1.3617902320984665,
+        "same_row_other_printed_year_errors": 22
+      }
+    },
+    "pair_concat": {
+      "Train": {
+        "correct": 523,
+        "denominator": 537,
+        "mean_ce": 0.08213712999263262,
+        "same_row_other_printed_year_errors": 0
+      },
+      "Validation": {
+        "correct": 82,
+        "denominator": 96,
+        "mean_ce": 0.9411024009270553,
+        "same_row_other_printed_year_errors": 3
+      }
+    },
+    "pair_interaction": {
+      "Train": {
+        "correct": 519,
+        "denominator": 537,
+        "mean_ce": 0.1043326729126187,
+        "same_row_other_printed_year_errors": 0
+      },
+      "Validation": {
+        "correct": 82,
+        "denominator": 96,
+        "mean_ce": 1.0696880837571634,
+        "same_row_other_printed_year_errors": 3
+      }
+    }
+  },
+  "repeat_results": {
+    "baseline": {
+      "Train": {
+        "correct": 468,
+        "denominator": 537,
+        "mean_ce": 0.3863918569536818,
+        "same_row_other_printed_year_errors": 44
+      },
+      "Validation": {
+        "correct": 56,
+        "denominator": 96,
+        "mean_ce": 1.3617902320984665,
+        "same_row_other_printed_year_errors": 22
+      }
+    },
+    "pair_concat": {
+      "Train": {
+        "correct": 523,
+        "denominator": 537,
+        "mean_ce": 0.08213712999263262,
+        "same_row_other_printed_year_errors": 0
+      },
+      "Validation": {
+        "correct": 82,
+        "denominator": 96,
+        "mean_ce": 0.9411024009270553,
+        "same_row_other_printed_year_errors": 3
+      }
+    },
+    "pair_interaction": {
+      "Train": {
+        "correct": 519,
+        "denominator": 537,
+        "mean_ce": 0.1043326729126187,
+        "same_row_other_printed_year_errors": 0
+      },
+      "Validation": {
+        "correct": 82,
+        "denominator": 96,
+        "mean_ce": 1.0696880837571634,
+        "same_row_other_printed_year_errors": 3
+      }
+    }
+  },
+  "comparisons": {
+    "baseline": {
+      "Train": {
+        "prediction_files_byte_identical": true,
+        "sha256_first": "6a68ad61972f3af918bbc3ebc5c1f52d1a2ea58bd877bda935868eda77616aa7",
+        "sha256_repeat": "6a68ad61972f3af918bbc3ebc5c1f52d1a2ea58bd877bda935868eda77616aa7"
+      },
+      "Validation": {
+        "prediction_files_byte_identical": true,
+        "sha256_first": "e24be6e6cf90c5dff57c8fb25453f8157d13a3b607bd188f91e40fe52f1c0550",
+        "sha256_repeat": "e24be6e6cf90c5dff57c8fb25453f8157d13a3b607bd188f91e40fe52f1c0550"
+      }
+    },
+    "pair_concat": {
+      "Train": {
+        "prediction_files_byte_identical": true,
+        "sha256_first": "1203179d013d49b5f7c1eb53c3c8f1eeff1870c3ee5b64e6055ab8ff2ed3846d",
+        "sha256_repeat": "1203179d013d49b5f7c1eb53c3c8f1eeff1870c3ee5b64e6055ab8ff2ed3846d"
+      },
+      "Validation": {
+        "prediction_files_byte_identical": true,
+        "sha256_first": "5200ead437f7ad4d910b1078ba7f4932a38c24d91d011a46f16434d19ff7b4c2",
+        "sha256_repeat": "5200ead437f7ad4d910b1078ba7f4932a38c24d91d011a46f16434d19ff7b4c2"
+      }
+    },
+    "pair_interaction": {
+      "Train": {
+        "prediction_files_byte_identical": true,
+        "sha256_first": "9d7b728a4707278d520a6267f3347232f7ad4ac8b6e05ca7e446d78ce9f3b071",
+        "sha256_repeat": "9d7b728a4707278d520a6267f3347232f7ad4ac8b6e05ca7e446d78ce9f3b071"
+      },
+      "Validation": {
+        "prediction_files_byte_identical": true,
+        "sha256_first": "cd0d2be7921b37e8a75571c22e01f857a0ae8431e721c61990a7d53e55792127",
+        "sha256_repeat": "cd0d2be7921b37e8a75571c22e01f857a0ae8431e721c61990a7d53e55792127"
+      }
+    }
+  },
+  "source_sha256": {
+    "train.py": "66a7932c4d5bd7bb6239845fdc0b24fa714b1fe43e924115d9e20a5232b95cb2",
+    "models.py": "d268bc051c032ecd0fc7b24a214370c964491122415533ebfd0b7d1ce58e978e"
+  },
+  "original_archive_sha256": "7cb639ef18e9ea539ae1ce29f9c7710a80a79eb438d37ae185d51445af527517",
+  "fresh_repeat_all_predictions_byte_identical": true,
+  "old_training_reproduced": false,
+  "conclusion": "Two fresh complete training runs reproduce each other exactly in predictions/logits/loss files but differ from archived original training. Old checkpoint choices still replay. Cause of historical training divergence not established."
+}

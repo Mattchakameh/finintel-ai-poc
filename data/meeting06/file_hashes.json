@@ -1,0 +1,14 @@
+{
+  "data/meeting06/bcd_verified_results.json": "3905208737b65cc85240479f364d85f649736b0287cb9b7dfefb8bc73d1962c5",
+  "data/meeting06/examples.json": "13be153491f032511bbfa410094f6c8b2bdb9f947224e50780e9f45cd9089f2f",
+  "data/meeting06/header_checkpoint_replay.json": "2dc6e6bf0b4948005c2e49df05d5afb0dc7fd9d82e69e8699536d5028b4f384b",
+  "data/meeting06/header_training_comparison.json": "25b61e17d507619a10c6492649c53d5a201cb5a58b168b7189ee8b6300978ec6",
+  "data/meeting06/metadata.json": "d445fad88b1f0ea78ad3c3de0acb62faf4a209dd98fe642d0a2cb0bf96dfebc6",
+  "data/meeting06/qwen_saved_responses.jsonl": "8aa9b0b75833971ed5ea76e60ea749bbd279c7fec3a2e3f46672ee3b665f2a68",
+  "data/meeting06/qwen_summary.json": "37af8f48b0eddbce386b162d7f7b71075572a36d1a55374455f98cc5b9466ab1",
+  "assets/meeting06/182_model224.png": "b1f06d66c04d4843dba9976d34e1e765b5396433676d4cd11b292600f6f46b51",
+  "assets/meeting06/182_native.png": "c88cd715ef8686b2e158ae681c5397b2b3ca453cc49aca6841ccabd2216e5121",
+  "assets/meeting06/186_model224.png": "83c0a86f4b2e3ea9442c56ed890e70302ba3b689706947d8327c23fa7bd79fab",
+  "assets/meeting06/186_native.png": "18d0c66dca49711a9c002e866c97f69468461de649eaf2b430843ea637975ca0",
+  "assets/meeting06/original_extraction_curves.png": "541062b513d782fc8aa70404526f4b3ea680dd59934c978a5d0701e495407920"
+}

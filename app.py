@@ -15,19 +15,13 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 
-from src.data_loader import (
-    POCDataLoadError,
-    compute_retrieval_metrics,
-    load_poc_data,
-    run_pipeline_validation,
-)
 from src.meeting03_loader import (
     Meeting03EvidenceError,
     load_and_validate_meeting03,
 )
 from src.meeting04_view import render_meeting04
 from src.meeting05_view import render_meeting05
-from src.retrieval import build_faiss_index, live_search
+from src.meeting06_view import render_meeting06
 
 ASSETS_DIR = Path(__file__).resolve().parent / "assets"
 
@@ -46,8 +40,9 @@ dashboard_view = st.sidebar.radio(
         "Meeting 03 — Learning & Evaluation",
         "Meeting 04 — Multimodal Grounding & Fusion",
         "Meeting 05 — Grounding Audit & Diagnostics",
+        "Meeting 06 — Readable Evidence & Next Steps",
     ],
-    index=0,
+    index=4,
 )
 
 st.sidebar.caption(
@@ -56,6 +51,10 @@ st.sidebar.caption(
     "30 companies × 5 fiscal years × 6 financial concepts. "
     "Meeting 05 separates neural diagnostics from rule-based source extraction."
 )
+
+if dashboard_view == "Meeting 06 — Readable Evidence & Next Steps":
+    render_meeting06()
+    st.stop()
 
 if dashboard_view == "Meeting 05 — Grounding Audit & Diagnostics":
     render_meeting05()
@@ -332,6 +331,16 @@ if dashboard_view == "Meeting 03 — Learning & Evaluation":
     )
     st.stop()
 
+
+# Legacy Meeting 02 alone requires its original checkpoint and ML dependencies.
+try:
+    from src.data_loader import (POCDataLoadError, compute_retrieval_metrics,
+                                 load_poc_data, run_pipeline_validation)
+    from src.retrieval import build_faiss_index, live_search
+except ImportError as error:
+    st.error("Meeting 02 requires its original full environment. See README_REVIEW.md.")
+    st.code(str(error))
+    st.stop()
 
 # ----------------------------------------------------------------------
 # Data loading (cached for the process lifetime)

@@ -1,0 +1,160 @@
+[
+  {
+    "id": "182",
+    "question": "Company: CSCO | Fiscal year: 2021 | Metric: Equity",
+    "split": "Validation",
+    "options": [
+      {
+        "id": "0",
+        "value": "41275000000"
+      },
+      {
+        "id": "1",
+        "value": "39773000000"
+      },
+      {
+        "id": "2",
+        "value": "43204000000"
+      },
+      {
+        "id": "3",
+        "value": "38647000000"
+      }
+    ],
+    "gold_option_id": "0",
+    "rows": {
+      "model224": {
+        "id": "182",
+        "split": "Validation",
+        "arm": "model224",
+        "order_seed": 11,
+        "letter_to_option_id": {
+          "A": "3",
+          "B": "2",
+          "C": "1",
+          "D": "0"
+        },
+        "prompt_text": "Use only the full supplied table image to answer the question. Options are amounts in raw base units, not thousands or millions. Respect the table scale, fiscal period and requested concept. Return exactly one letter A, B, C or D.\nCompany: CSCO | Fiscal year: 2021 | Metric: Equity\nA. 38647000000\nB. 43204000000\nC. 39773000000\nD. 41275000000",
+        "image_grid_thw": [
+          [
+            1,
+            32,
+            32
+          ]
+        ],
+        "input_tokens": 391,
+        "raw": "C",
+        "option_id": "1",
+        "status": "ok"
+      },
+      "native": {
+        "id": "182",
+        "split": "Validation",
+        "arm": "native",
+        "order_seed": 11,
+        "letter_to_option_id": {
+          "A": "3",
+          "B": "2",
+          "C": "1",
+          "D": "0"
+        },
+        "prompt_text": "Use only the full supplied table image to answer the question. Options are amounts in raw base units, not thousands or millions. Respect the table scale, fiscal period and requested concept. Return exactly one letter A, B, C or D.\nCompany: CSCO | Fiscal year: 2021 | Metric: Equity\nA. 38647000000\nB. 43204000000\nC. 39773000000\nD. 41275000000",
+        "image_grid_thw": [
+          [
+            1,
+            48,
+            82
+          ]
+        ],
+        "input_tokens": 1119,
+        "raw": "D",
+        "option_id": "0",
+        "status": "ok"
+      }
+    },
+    "label": "Native succeeds; reduced image fails",
+    "images": {
+      "model224": "assets/meeting06/182_model224.png",
+      "native": "assets/meeting06/182_native.png"
+    }
+  },
+  {
+    "id": "186",
+    "question": "Company: CSCO | Fiscal year: 2022 | Metric: Assets",
+    "split": "Validation",
+    "options": [
+      {
+        "id": "0",
+        "value": "94002000000"
+      },
+      {
+        "id": "1",
+        "value": "94853000000"
+      },
+      {
+        "id": "2",
+        "value": "91759000000"
+      },
+      {
+        "id": "3",
+        "value": "97497000000"
+      }
+    ],
+    "gold_option_id": "0",
+    "rows": {
+      "model224": {
+        "id": "186",
+        "split": "Validation",
+        "arm": "model224",
+        "order_seed": 11,
+        "letter_to_option_id": {
+          "A": "1",
+          "B": "3",
+          "C": "2",
+          "D": "0"
+        },
+        "prompt_text": "Use only the full supplied table image to answer the question. Options are amounts in raw base units, not thousands or millions. Respect the table scale, fiscal period and requested concept. Return exactly one letter A, B, C or D.\nCompany: CSCO | Fiscal year: 2022 | Metric: Assets\nA. 94853000000\nB. 97497000000\nC. 91759000000\nD. 94002000000",
+        "image_grid_thw": [
+          [
+            1,
+            32,
+            32
+          ]
+        ],
+        "input_tokens": 391,
+        "raw": "B",
+        "option_id": "3",
+        "status": "ok"
+      },
+      "native": {
+        "id": "186",
+        "split": "Validation",
+        "arm": "native",
+        "order_seed": 11,
+        "letter_to_option_id": {
+          "A": "1",
+          "B": "3",
+          "C": "2",
+          "D": "0"
+        },
+        "prompt_text": "Use only the full supplied table image to answer the question. Options are amounts in raw base units, not thousands or millions. Respect the table scale, fiscal period and requested concept. Return exactly one letter A, B, C or D.\nCompany: CSCO | Fiscal year: 2022 | Metric: Assets\nA. 94853000000\nB. 97497000000\nC. 91759000000\nD. 94002000000",
+        "image_grid_thw": [
+          [
+            1,
+            52,
+            76
+          ]
+        ],
+        "input_tokens": 1123,
+        "raw": "C",
+        "option_id": "2",
+        "status": "ok"
+      }
+    },
+    "label": "Native also fails",
+    "images": {
+      "model224": "assets/meeting06/186_model224.png",
+      "native": "assets/meeting06/186_native.png"
+    }
+  }
+]

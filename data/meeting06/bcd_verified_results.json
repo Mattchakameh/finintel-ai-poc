@@ -1,0 +1,207 @@
+{
+  "passed": true,
+  "archive_sha256": "4a6e823fa7dc6799d7fac98d4b98403a8c5a2d83bedf108771882b7dac7093d8",
+  "scope": "Saved results only; no neural model or protected Test read",
+  "metrics": {
+    "original_reference": {
+      "Train": {
+        "correct": 468,
+        "denominator": 537,
+        "exact_cell_accuracy": 0.8715083798882681,
+        "mean_ce": 0.3863918569536818
+      },
+      "Validation": {
+        "correct": 56,
+        "denominator": 96,
+        "exact_cell_accuracy": 0.5833333333333334,
+        "mean_ce": 1.3617902320984665
+      }
+    },
+    "B": {
+      "Train": {
+        "correct": 276,
+        "denominator": 537,
+        "exact_cell_accuracy": 0.5139664804469274,
+        "mean_ce": 1.2893196492554755
+      },
+      "Validation": {
+        "correct": 41,
+        "denominator": 96,
+        "exact_cell_accuracy": 0.4270833333333333,
+        "mean_ce": 1.4865413028746843
+      }
+    },
+    "C": {
+      "Train": {
+        "correct": 436,
+        "denominator": 537,
+        "exact_cell_accuracy": 0.8119180633147114,
+        "mean_ce": 0.5071075384338599
+      },
+      "Validation": {
+        "correct": 57,
+        "denominator": 96,
+        "exact_cell_accuracy": 0.59375,
+        "mean_ce": 0.9833843105298001
+      }
+    },
+    "D": {
+      "Train": {
+        "correct": 432,
+        "denominator": 537,
+        "exact_cell_accuracy": 0.8044692737430168,
+        "mean_ce": 0.46347426126485397
+      },
+      "Validation": {
+        "correct": 62,
+        "denominator": 96,
+        "exact_cell_accuracy": 0.6458333333333334,
+        "mean_ce": 1.1161615493192205
+      }
+    }
+  },
+  "paired_validation": {
+    "D_vs_C": {
+      "fixes": 12,
+      "regressions": 7,
+      "net_correct": 5
+    },
+    "C_vs_B": {
+      "fixes": 27,
+      "regressions": 11,
+      "net_correct": 16
+    },
+    "D_vs_B": {
+      "fixes": 27,
+      "regressions": 6,
+      "net_correct": 21
+    },
+    "B_vs_original_reference": {
+      "fixes": 10,
+      "regressions": 25,
+      "net_correct": -15
+    },
+    "C_vs_original_reference": {
+      "fixes": 14,
+      "regressions": 13,
+      "net_correct": 1
+    },
+    "D_vs_original_reference": {
+      "fixes": 15,
+      "regressions": 9,
+      "net_correct": 6
+    }
+  },
+  "A": "NOT_TRAINED",
+  "interpretation": "Single-seed repeatedly reused development Validation; not untouched Test, not causal proof; C/D parameter counts differ.",
+  "all_three_archive_hashes_verified": true,
+  "by_company_correct_total": {
+    "CSCO": {
+      "original_reference": [
+        22,
+        25
+      ],
+      "B": [
+        13,
+        25
+      ],
+      "C": [
+        24,
+        25
+      ],
+      "D": [
+        21,
+        25
+      ]
+    },
+    "DUK": {
+      "original_reference": [
+        12,
+        18
+      ],
+      "B": [
+        10,
+        18
+      ],
+      "C": [
+        14,
+        18
+      ],
+      "D": [
+        18,
+        18
+      ]
+    },
+    "HD": {
+      "original_reference": [
+        9,
+        24
+      ],
+      "B": [
+        9,
+        24
+      ],
+      "C": [
+        9,
+        24
+      ],
+      "D": [
+        12,
+        24
+      ]
+    },
+    "META": {
+      "original_reference": [
+        13,
+        29
+      ],
+      "B": [
+        9,
+        29
+      ],
+      "C": [
+        10,
+        29
+      ],
+      "D": [
+        11,
+        29
+      ]
+    }
+  },
+  "actual_neural_top2_number_presence_diagnostic": {
+    "Train": {
+      "n": 537,
+      "printed_number_present": 0,
+      "ids": []
+    },
+    "Validation": {
+      "n": 96,
+      "printed_number_present": 0,
+      "ids": []
+    }
+  },
+  "warning": "Number presence is NOT verified relevant evidence, retrieval accuracy, narrative supervision, or correctness; no scale conversion.",
+  "source_archive_filename": "FinIntel_BCD_Results_20261111T212511Z.zip",
+  "source_archive_bytes": 65370127,
+  "parameter_counts": {
+    "original_reference": 468739,
+    "B": 152321,
+    "C": 211329,
+    "D": 227969
+  },
+  "seed": 20261031,
+  "epochs": 5,
+  "optimizer": "AdamW",
+  "learning_rate": 0.001,
+  "weight_decay": 0.01,
+  "batch_questions": 8,
+  "gradient_clip": 1,
+  "dropout": 0,
+  "decoder": "Unmasked argmax over the unchanged original eligible table-cell candidates",
+  "loss": "Question-level cross-entropy over candidate-cell logits",
+  "target": "Original label_cell_id; used by supervised loss/evaluator only",
+  "selection": "Fixed final epoch5; no Validation-based checkpoint selection",
+  "original_reference": "Concurrent retrained original QuestionModalityScorer: frozen FinBERT joint question/candidate CLS and frozen ViT local,row,global CLS with question-only two-modality gate. Not A, not Qwen.",
+  "input_limitations": "Original candidate coverage and frozen feature/truncation/image preprocessing retained. B adds mean of two retrieved FinBERT passage embeddings via candidate-level late fusion; C/D share same text and three image views. D attends over those views, not raw image patches."
+}

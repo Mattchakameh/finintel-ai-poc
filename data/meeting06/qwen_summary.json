@@ -1,0 +1,518 @@
+{
+  "evidence": "All 7880 saved notebook response logs independently reparsed and rescored under original deterministic option-order code. This is saved-log verification, not fresh inference. Full raw archives for four seeds remain unverified for grids, prompts, token counts and runtime metadata.",
+  "notebook_sha256": "6632cfa03dde3f0868642c45c06406db015cc19a783e21e59fdb8ea6854d0c14",
+  "runner_sha256": "9c96f7802cde76972cc6a9d186cb2a8b36a8cb3f39e5e94b89ed4091c3c653aa",
+  "per_seed": [
+    {
+      "seed": 11,
+      "split": "Train",
+      "arm": "native",
+      "correct": 413,
+      "total": 543,
+      "observed": 543,
+      "missing": 0,
+      "accuracy": 0.7605893186003683,
+      "statuses": {
+        "ok": 541,
+        "invalid": 2
+      },
+      "complete": true
+    },
+    {
+      "seed": 11,
+      "split": "Train",
+      "arm": "model224",
+      "correct": 155,
+      "total": 543,
+      "observed": 543,
+      "missing": 0,
+      "accuracy": 0.285451197053407,
+      "statuses": {
+        "ok": 543
+      },
+      "complete": true
+    },
+    {
+      "seed": 11,
+      "split": "Validation",
+      "arm": "native",
+      "correct": 75,
+      "total": 115,
+      "observed": 115,
+      "missing": 0,
+      "accuracy": 0.6521739130434783,
+      "statuses": {
+        "ok": 115
+      },
+      "complete": true
+    },
+    {
+      "seed": 11,
+      "split": "Validation",
+      "arm": "model224",
+      "correct": 37,
+      "total": 115,
+      "observed": 115,
+      "missing": 0,
+      "accuracy": 0.3217391304347826,
+      "statuses": {
+        "ok": 115
+      },
+      "complete": true
+    },
+    {
+      "seed": 11,
+      "split": "Test",
+      "arm": "native",
+      "correct": 96,
+      "total": 130,
+      "observed": 130,
+      "missing": 0,
+      "accuracy": 0.7384615384615385,
+      "statuses": {
+        "ok": 130
+      },
+      "complete": true
+    },
+    {
+      "seed": 11,
+      "split": "Test",
+      "arm": "model224",
+      "correct": 38,
+      "total": 130,
+      "observed": 130,
+      "missing": 0,
+      "accuracy": 0.2923076923076923,
+      "statuses": {
+        "ok": 130
+      },
+      "complete": true
+    },
+    {
+      "seed": 22,
+      "split": "Train",
+      "arm": "native",
+      "correct": 395,
+      "total": 543,
+      "observed": 543,
+      "missing": 0,
+      "accuracy": 0.7274401473296501,
+      "statuses": {
+        "ok": 541,
+        "invalid": 2
+      },
+      "complete": true
+    },
+    {
+      "seed": 22,
+      "split": "Train",
+      "arm": "model224",
+      "correct": 146,
+      "total": 543,
+      "observed": 543,
+      "missing": 0,
+      "accuracy": 0.26887661141804786,
+      "statuses": {
+        "ok": 543
+      },
+      "complete": true
+    },
+    {
+      "seed": 22,
+      "split": "Validation",
+      "arm": "native",
+      "correct": 74,
+      "total": 115,
+      "observed": 115,
+      "missing": 0,
+      "accuracy": 0.6434782608695652,
+      "statuses": {
+        "ok": 115
+      },
+      "complete": true
+    },
+    {
+      "seed": 22,
+      "split": "Validation",
+      "arm": "model224",
+      "correct": 31,
+      "total": 115,
+      "observed": 115,
+      "missing": 0,
+      "accuracy": 0.26956521739130435,
+      "statuses": {
+        "ok": 115
+      },
+      "complete": true
+    },
+    {
+      "seed": 22,
+      "split": "Test",
+      "arm": "native",
+      "correct": 95,
+      "total": 130,
+      "observed": 130,
+      "missing": 0,
+      "accuracy": 0.7307692307692307,
+      "statuses": {
+        "ok": 130
+      },
+      "complete": true
+    },
+    {
+      "seed": 22,
+      "split": "Test",
+      "arm": "model224",
+      "correct": 29,
+      "total": 130,
+      "observed": 130,
+      "missing": 0,
+      "accuracy": 0.2230769230769231,
+      "statuses": {
+        "ok": 130
+      },
+      "complete": true
+    },
+    {
+      "seed": 33,
+      "split": "Train",
+      "arm": "native",
+      "correct": 405,
+      "total": 543,
+      "observed": 543,
+      "missing": 0,
+      "accuracy": 0.7458563535911602,
+      "statuses": {
+        "ok": 541,
+        "invalid": 2
+      },
+      "complete": true
+    },
+    {
+      "seed": 33,
+      "split": "Train",
+      "arm": "model224",
+      "correct": 146,
+      "total": 543,
+      "observed": 543,
+      "missing": 0,
+      "accuracy": 0.26887661141804786,
+      "statuses": {
+        "ok": 543
+      },
+      "complete": true
+    },
+    {
+      "seed": 33,
+      "split": "Validation",
+      "arm": "native",
+      "correct": 82,
+      "total": 115,
+      "observed": 115,
+      "missing": 0,
+      "accuracy": 0.7130434782608696,
+      "statuses": {
+        "ok": 115
+      },
+      "complete": true
+    },
+    {
+      "seed": 33,
+      "split": "Validation",
+      "arm": "model224",
+      "correct": 33,
+      "total": 115,
+      "observed": 115,
+      "missing": 0,
+      "accuracy": 0.28695652173913044,
+      "statuses": {
+        "ok": 115
+      },
+      "complete": true
+    },
+    {
+      "seed": 33,
+      "split": "Test",
+      "arm": "native",
+      "correct": 103,
+      "total": 130,
+      "observed": 130,
+      "missing": 0,
+      "accuracy": 0.7923076923076923,
+      "statuses": {
+        "ok": 130
+      },
+      "complete": true
+    },
+    {
+      "seed": 33,
+      "split": "Test",
+      "arm": "model224",
+      "correct": 36,
+      "total": 130,
+      "observed": 130,
+      "missing": 0,
+      "accuracy": 0.27692307692307694,
+      "statuses": {
+        "ok": 130
+      },
+      "complete": true
+    },
+    {
+      "seed": 44,
+      "split": "Train",
+      "arm": "native",
+      "correct": 410,
+      "total": 543,
+      "observed": 543,
+      "missing": 0,
+      "accuracy": 0.7550644567219152,
+      "statuses": {
+        "ok": 541,
+        "invalid": 2
+      },
+      "complete": true
+    },
+    {
+      "seed": 44,
+      "split": "Train",
+      "arm": "model224",
+      "correct": 154,
+      "total": 543,
+      "observed": 543,
+      "missing": 0,
+      "accuracy": 0.283609576427256,
+      "statuses": {
+        "ok": 543
+      },
+      "complete": true
+    },
+    {
+      "seed": 44,
+      "split": "Validation",
+      "arm": "native",
+      "correct": 81,
+      "total": 115,
+      "observed": 115,
+      "missing": 0,
+      "accuracy": 0.7043478260869566,
+      "statuses": {
+        "ok": 115
+      },
+      "complete": true
+    },
+    {
+      "seed": 44,
+      "split": "Validation",
+      "arm": "model224",
+      "correct": 30,
+      "total": 115,
+      "observed": 115,
+      "missing": 0,
+      "accuracy": 0.2608695652173913,
+      "statuses": {
+        "ok": 115
+      },
+      "complete": true
+    },
+    {
+      "seed": 44,
+      "split": "Test",
+      "arm": "native",
+      "correct": 103,
+      "total": 130,
+      "observed": 130,
+      "missing": 0,
+      "accuracy": 0.7923076923076923,
+      "statuses": {
+        "ok": 130
+      },
+      "complete": true
+    },
+    {
+      "seed": 44,
+      "split": "Test",
+      "arm": "model224",
+      "correct": 40,
+      "total": 130,
+      "observed": 130,
+      "missing": 0,
+      "accuracy": 0.3076923076923077,
+      "statuses": {
+        "ok": 130
+      },
+      "complete": true
+    },
+    {
+      "seed": 55,
+      "split": "Train",
+      "arm": "native",
+      "correct": 430,
+      "total": 543,
+      "observed": 543,
+      "missing": 0,
+      "accuracy": 0.7918968692449355,
+      "statuses": {
+        "ok": 541,
+        "invalid": 2
+      },
+      "complete": true
+    },
+    {
+      "seed": 55,
+      "split": "Train",
+      "arm": "model224",
+      "correct": 149,
+      "total": 543,
+      "observed": 543,
+      "missing": 0,
+      "accuracy": 0.27440147329650094,
+      "statuses": {
+        "ok": 543
+      },
+      "complete": true
+    },
+    {
+      "seed": 55,
+      "split": "Validation",
+      "arm": "native",
+      "correct": 81,
+      "total": 115,
+      "observed": 115,
+      "missing": 0,
+      "accuracy": 0.7043478260869566,
+      "statuses": {
+        "ok": 115
+      },
+      "complete": true
+    },
+    {
+      "seed": 55,
+      "split": "Validation",
+      "arm": "model224",
+      "correct": 28,
+      "total": 115,
+      "observed": 115,
+      "missing": 0,
+      "accuracy": 0.24347826086956523,
+      "statuses": {
+        "ok": 115
+      },
+      "complete": true
+    },
+    {
+      "seed": 55,
+      "split": "Test",
+      "arm": "native",
+      "correct": 101,
+      "total": 130,
+      "observed": 130,
+      "missing": 0,
+      "accuracy": 0.7769230769230769,
+      "statuses": {
+        "ok": 130
+      },
+      "complete": true
+    },
+    {
+      "seed": 55,
+      "split": "Test",
+      "arm": "model224",
+      "correct": 45,
+      "total": 130,
+      "observed": 130,
+      "missing": 0,
+      "accuracy": 0.34615384615384615,
+      "statuses": {
+        "ok": 130
+      },
+      "complete": true
+    }
+  ],
+  "summary": [
+    {
+      "split": "Train",
+      "arm": "native",
+      "counts": [
+        413,
+        395,
+        405,
+        410,
+        430
+      ],
+      "n": 543,
+      "mean_percent": 75.6169429097606,
+      "sample_sd_pp": 2.360581244075777
+    },
+    {
+      "split": "Train",
+      "arm": "model224",
+      "counts": [
+        155,
+        146,
+        146,
+        154,
+        149
+      ],
+      "n": 543,
+      "mean_percent": 27.624309392265193,
+      "sample_sd_pp": 0.7921109822322859
+    },
+    {
+      "split": "Validation",
+      "arm": "native",
+      "counts": [
+        75,
+        74,
+        82,
+        81,
+        81
+      ],
+      "n": 115,
+      "mean_percent": 68.34782608695652,
+      "sample_sd_pp": 3.2882905045546167
+    },
+    {
+      "split": "Validation",
+      "arm": "model224",
+      "counts": [
+        37,
+        31,
+        33,
+        30,
+        28
+      ],
+      "n": 115,
+      "mean_percent": 27.652173913043477,
+      "sample_sd_pp": 2.974370674171663
+    },
+    {
+      "split": "Test",
+      "arm": "native",
+      "counts": [
+        96,
+        95,
+        103,
+        103,
+        101
+      ],
+      "n": 130,
+      "mean_percent": 76.61538461538461,
+      "sample_sd_pp": 2.959289855641744
+    },
+    {
+      "split": "Test",
+      "arm": "model224",
+      "counts": [
+        38,
+        29,
+        36,
+        40,
+        45
+      ],
+      "n": 130,
+      "mean_percent": 28.923076923076923,
+      "sample_sd_pp": 4.505092450568099
+    }
+  ]
+}
