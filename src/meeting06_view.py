@@ -440,7 +440,7 @@ def render_meeting06():
     st.divider()
     st.subheader("Original extraction pilot: four training histories")
     st.caption("537 Train / 96 eligible Validation questions · one seed (20261031) · five epochs. These older runs are separate from the newer narrative B/C/D comparison above.")
-    st.info("The local-context text pilot uses cell, row and header text. It is not the planned narrative-only Model A. The adaptive visual gate is not the full proposed Adaptive Reading method.")
+    st.info("The local-context text pilot uses the question plus cell, row and header text. It is not the planned narrative-only Model A. The adaptive visual gate is not the full proposed Adaptive Reading method.")
     history = pd.read_csv(ROOT / "data/meeting06/original_pilot_epoch_data.csv")
     history_labels = {"text_only": "Local-context text", "full_table_text_b": "Full-table text", "baseline": "Concatenation", "adaptive_pilot": "Adaptive visual gate"}
     chosen = st.selectbox("Explore an original pilot training history", list(history_labels), format_func=history_labels.get, key="m06_original_history")
@@ -453,6 +453,7 @@ def render_meeting06():
     selected_rows = history.loc[history["selected_checkpoint"].astype(str).str.lower() == "true"].copy()
     st.dataframe(pd.DataFrame([{"Pilot": history_labels[row["model"]], "Selected epoch": int(row["epoch"]), "Validation correct": f"{int(row['validation_correct_fixed_post_epoch'])}/96", "Validation accuracy (%)": round(row["validation_accuracy_percent"], 2)} for row in selected_rows.to_dict("records")]), hide_index=True, width="stretch")
     st.caption("Checkpoints were selected using reused Validation accuracy, not an independent Test set. Different inputs and model capacities prevent attributing the differences to fusion alone. These are verified saved training histories, not newly replayed training.")
+    st.caption("Source: saved original pilot training logs for local-context text, full-table text and adaptive visual gate; saved epoch-results report for concatenation. Selected epochs: 5, 5, 3 and 5 respectively.")
     with st.expander("View all four original pilot curves"):
         st.image(str(ROOT / "assets/meeting06/original_four_training_histories.png"), caption="Original pilot: Train and Validation accuracy across epochs", width="stretch")
     st.download_button("Download original pilot epoch data", (ROOT / "data/meeting06/original_pilot_epoch_data.csv").read_bytes(), file_name="original_pilot_epoch_data.csv", mime="text/csv")
