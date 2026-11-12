@@ -1,0 +1,17 @@
+{
+  "text_only": {
+    "source": "FinIntel_project_bundle_20261102/FinIntel_project_bundle_20261102/04_three_arm_comparison/text_only_uploaded_log.txt",
+    "sha256": "64f14476b8f528917db3974dc052f51597e1cae50cea8b93fa709149971c2a66",
+    "epochs_verified_against_csv": 5
+  },
+  "full_table_text_b": {
+    "source": "FinIntel_project_bundle_20261102/FinIntel_project_bundle_20261102/05_final_four_arm_comparison/full_table_b_uploaded_log.txt",
+    "sha256": "08adca35651397cbb3a1453a43c1221a2b5d86f78475f0fa5578782113c6b756",
+    "epochs_verified_against_csv": 5
+  },
+  "adaptive_pilot": {
+    "source": "FinIntel_project_bundle_20261102/FinIntel_project_bundle_20261102/02_adaptive_visual_gate/adaptive_uploaded_log.txt",
+    "sha256": "c69265fcd0bd517721ec6574376b45d4386654983a92fd0b8c78883f2d2d0e6d",
+    "epochs_verified_against_csv": 5
+  }
+}

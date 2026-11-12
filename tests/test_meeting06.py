@@ -238,3 +238,14 @@ def test_reproducibility_warnings_render():
     ]:
         assert fragment in text
     assert not any(t.label == "Earlier diagnostics" for t in app.tabs)
+
+
+def test_original_pilot_histories_are_separate_and_interactive():
+    from streamlit.testing.v1 import AppTest
+    at = AppTest.from_file(str(Path(__file__).resolve().parents[1] / 'app.py')).run()
+    for model in ['text_only', 'full_table_text_b', 'baseline', 'adaptive_pilot']:
+        at.selectbox(key='m06_original_history').set_value(model).run()
+        assert not at.exception
+    text = '\n'.join(str(x.value) for x in at.caption)
+    assert 'before Qwen internal preprocessing' in text
+    assert 'These older runs are separate' in text

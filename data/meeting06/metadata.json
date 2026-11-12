@@ -39,7 +39,7 @@
     "All original splits were previously exposed. Historical Test is not an untouched holdout.",
     "Five seeds vary option presentation, not model training; the same 788 questions are repeated.",
     "Original labels and known source/period/scope defects are retained. No answer correction or numeric-rule fallback.",
-    "Native and reduced-image arms are not compute matched. Both use the same Qwen processor bounds; reduced images may be upsampled.",
+    "Original and resized-image conditions are not compute matched. Both use the same Qwen processor bounds; reduced images may be upsampled.",
     "Saved responses were checked, not regenerated. Full prompt/grid/token/runtime archive audit is verified only for order seed 11.",
     "Qwen results do not establish a gain for the FinBERT/ViT model or a causal advantage of fusion."
   ]

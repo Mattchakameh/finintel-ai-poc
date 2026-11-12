@@ -12,7 +12,7 @@ import streamlit as st
 from src.meeting06_data import EvidenceError, load_evidence, stability
 
 ROOT = Path(__file__).resolve().parents[1]
-ARM_NAMES = {"native": "Native image", "model224": "224×224 source"}
+ARM_NAMES = {"native": "Original image", "model224": "Resized image (224 × 224)"}
 SPLIT_NAMES = {
     "Train": "Train · 543 questions",
     "Validation": "Validation · 115 questions",
@@ -34,7 +34,7 @@ def render_meeting06():
     meta = evidence["meta"]
     st.info(
         "Main finding: Qwen selects the original four-choice answer much more often from readable "
-        "native table images than from the same tables reduced to 224×224. This is a diagnostic "
+        "original table images than from the same tables reduced to 224×224. This is a diagnostic "
         "result, not a demonstrated improvement to the FinBERT/ViT model."
     )
     st.success(
@@ -45,6 +45,8 @@ def render_meeting06():
     st.caption(
         "Two different studies: Qwen is a frozen four-choice image diagnostic; B/C/D are trained cell-selection heads. Their percentages are not directly comparable."
     )
+    st.subheader("Original image vs. resized image (224 × 224)")
+    st.caption("Original means the source image before Qwen internal preprocessing; both inputs subsequently pass through Qwen’s image processor.")
     split = st.selectbox(
         "Show Qwen results for",
         list(SPLIT_NAMES),
@@ -67,11 +69,11 @@ def render_meeting06():
     selected = {r["arm"]: r for r in evidence["results"] if r["split"] == split}
     native, reduced = selected["native"], selected["model224"]
     c1, c2, c3 = st.columns(3)
-    c1.metric("Native image · mean accuracy", f"{native['mean']:.2f}%")
+    c1.metric("Original image · mean accuracy", f"{native['mean']:.2f}%")
     c1.caption(f"± {native['sd']:.2f} percentage points across option orders")
-    c2.metric("224×224 source · mean accuracy", f"{reduced['mean']:.2f}%")
+    c2.metric("Resized image (224 × 224) · mean accuracy", f"{reduced['mean']:.2f}%")
     c2.caption(f"± {reduced['sd']:.2f} percentage points across option orders")
-    c3.metric("Native minus reduced", f"+{native['mean'] - reduced['mean']:.2f} pp")
+    c3.metric("Original minus resized", f"+{native['mean'] - reduced['mean']:.2f} pp")
     c3.caption(f"Same {native['n']} questions · 5 option orders · 25% chance")
     st.caption(
         "Mean ± sample SD across presentation seeds 11, 22, 33, 44 and 55. "
@@ -92,12 +94,12 @@ def render_meeting06():
         alt.Chart(chart_data)
         .mark_bar(size=42)
         .encode(
-            y=alt.Y("Image:N", sort=["Native image", "224×224 source"], title=None),
+            y=alt.Y("Image:N", sort=["Original image", "Resized image (224 × 224)"], title=None),
             x=alt.X("Accuracy (%):Q", scale=alt.Scale(domain=[0, 100])),
             color=alt.Color(
                 "Image:N",
                 scale=alt.Scale(
-                    domain=["Native image", "224×224 source"],
+                    domain=["Original image", "Resized image (224 × 224)"],
                     range=["#147d92", "#8e99a8"],
                 ),
                 legend=None,
@@ -133,7 +135,7 @@ def render_meeting06():
         with left:
             st.subheader("Supported by this result")
             st.write(
-                "Readable image detail matters in this Qwen four-choice setup. The native-image result is consistently higher across all five option orders."
+                "Readable image detail matters in this Qwen four-choice setup. The original-image result is consistently higher across all five option orders."
             )
             st.write(
                 "7,880 saved responses were independently re-parsed and mapped back to the original option identities. All 30 score groups match. Qwen inference was not independently rerun."
@@ -152,7 +154,7 @@ def render_meeting06():
     with example_tab:
         st.subheader("Same question, same table, two image conditions")
         st.caption(
-            "Two deliberately selected Validation examples from option order 11: one native-image success and one native-image failure. They illustrate behavior, not prevalence. Correctness uses the retained original label, not new source adjudication."
+            "Two deliberately selected Validation examples from option order 11: one original-image success and one original-image failure. They illustrate behavior, not prevalence. Correctness uses the retained original label, not new source adjudication."
         )
         case_index = st.selectbox(
             "Illustrative example",
@@ -186,7 +188,7 @@ def render_meeting06():
                     f"Input tokens: {row['input_tokens']:,} · processor grid {row['image_grid_thw']}"
                 )
         st.caption(
-            "Both images then pass through the same Qwen processor pixel bounds. The 224×224 source may be upsampled; lost detail is not restored. Token and compute budgets are not matched."
+            "Both images then pass through the same Qwen processor pixel bounds. The Resized image (224 × 224) may be upsampled; lost detail is not restored. Token and compute budgets are not matched."
         )
         with st.expander("Original label and saved responses"):
             st.write(
@@ -401,7 +403,7 @@ def render_meeting06():
             table.append(row)
         st.dataframe(pd.DataFrame(table), hide_index=True, width="stretch")
         st.caption(
-            "All groups complete; missing = 0. Native Train has two invalid responses per order, counted incorrect. All other groups have zero invalid responses."
+            "All groups complete; missing = 0. Original-image Train has two invalid responses per order, counted incorrect. All other groups have zero invalid responses."
         )
         st.subheader("Option-order stability")
         stability_rows = []
@@ -436,7 +438,26 @@ def render_meeting06():
                 f"Source branch commit: {meta['source_commit']}\nSaved notebook SHA-256: {meta['notebook_sha256']}\nQwen model revision: {meta['revision']}"
             )
     st.divider()
-    with st.expander("Original extraction pilot: training and validation curves"):
+    st.subheader("Original extraction pilot: four training histories")
+    st.caption("537 Train / 96 eligible Validation questions · one seed (20261031) · five epochs. These older runs are separate from the newer narrative B/C/D comparison above.")
+    st.info("The local-context text pilot uses cell, row and header text. It is not the planned narrative-only Model A. The adaptive visual gate is not the full proposed Adaptive Reading method.")
+    history = pd.read_csv(ROOT / "data/meeting06/original_pilot_epoch_data.csv")
+    history_labels = {"text_only": "Local-context text", "full_table_text_b": "Full-table text", "baseline": "Concatenation", "adaptive_pilot": "Adaptive visual gate"}
+    chosen = st.selectbox("Explore an original pilot training history", list(history_labels), format_func=history_labels.get, key="m06_original_history")
+    model_history = history.loc[history["model"] == chosen]
+    curve_rows = []
+    for row in model_history.to_dict("records"):
+        for partition in ["train", "validation"]:
+            curve_rows.append({"Epoch": row["epoch"], "Accuracy (%)": row[f"{partition}_accuracy_percent"], "Partition": partition.title()})
+    st.altair_chart(alt.Chart(pd.DataFrame(curve_rows)).mark_line(point=True).encode(x=alt.X("Epoch:O"), y=alt.Y("Accuracy (%):Q", scale=alt.Scale(domain=[0,100])), color="Partition:N", tooltip=["Epoch", "Partition", alt.Tooltip("Accuracy (%):Q", format=".2f")]), width="stretch")
+    selected_rows = history.loc[history["selected_checkpoint"].astype(str).str.lower() == "true"].copy()
+    st.dataframe(pd.DataFrame([{"Pilot": history_labels[row["model"]], "Selected epoch": int(row["epoch"]), "Validation correct": f"{int(row['validation_correct_fixed_post_epoch'])}/96", "Validation accuracy (%)": round(row["validation_accuracy_percent"], 2)} for row in selected_rows.to_dict("records")]), hide_index=True, width="stretch")
+    st.caption("Checkpoints were selected using reused Validation accuracy, not an independent Test set. Different inputs and model capacities prevent attributing the differences to fusion alone. These are verified saved training histories, not newly replayed training.")
+    with st.expander("View all four original pilot curves"):
+        st.image(str(ROOT / "assets/meeting06/original_four_training_histories.png"), caption="Original pilot: Train and Validation accuracy across epochs", width="stretch")
+    st.download_button("Download original pilot epoch data", (ROOT / "data/meeting06/original_pilot_epoch_data.csv").read_bytes(), file_name="original_pilot_epoch_data.csv", mime="text/csv")
+    with st.expander("Original concatenation pilot: saved loss and accuracy chart"):
+
         st.write("Original concatenation pilot, 537 Train and 96 eligible Validation questions, five epochs. This is not the newer narrative B/C/D comparison.")
         st.image(str(ROOT / "assets/meeting06/original_extraction_curves.png"), caption="Original saved notebook chart: loss and exact-cell accuracy", width="stretch")
         st.caption("Selected checkpoint: epoch 3, 59/96 Validation correct (61.46%). Reused development data, not an independent Test result.")
