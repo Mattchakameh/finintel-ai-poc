@@ -258,7 +258,7 @@ def render_meeting06():
             "4. Freeze the method, then evaluate on an independent extraction test."
         )
         st.info(
-            "H1, H2 and H3 remain unconfirmed. This review does not declare a final model."
+            "Promising early extraction results; controlled comparisons and independent evaluation are next. This review does not declare a final model."
         )
     with plan_tab:
         st.subheader("Learned extraction: verified B/C/D results")
