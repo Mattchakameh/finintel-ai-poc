@@ -13,6 +13,10 @@ from src.meeting06_data import EvidenceError, load_evidence, stability
 
 ROOT = Path(__file__).resolve().parents[1]
 ARM_NAMES = {"native": "Original image", "model224": "Resized image (224 × 224)"}
+EXAMPLE_LABELS = {
+    "Native succeeds; reduced image fails": "Original correct, resized incorrect",
+    "Native also fails": "Original also incorrect",
+}
 SPLIT_NAMES = {
     "Train": "Train · 543 questions",
     "Validation": "Validation · 115 questions",
@@ -154,12 +158,12 @@ def render_meeting06():
     with example_tab:
         st.subheader("Same question, same table, two image conditions")
         st.caption(
-            "Two deliberately selected Validation examples from option order 11: one original-image success and one original-image failure. They illustrate behavior, not prevalence. Correctness uses the retained original label, not new source adjudication."
+            "Two deliberately selected Validation examples from option order 11: one correct answer from the original image and one incorrect answer from the original image. They illustrate behavior, not prevalence. Correctness uses the retained original label, not new source adjudication."
         )
         case_index = st.selectbox(
             "Illustrative example",
             range(len(evidence["examples"])),
-            format_func=lambda i: evidence["examples"][i]["label"],
+            format_func=lambda i: EXAMPLE_LABELS.get(evidence["examples"][i]["label"], evidence["examples"][i]["label"]),
             key="m06_case",
         )
         case = evidence["examples"][case_index]
