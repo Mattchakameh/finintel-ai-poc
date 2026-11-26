@@ -1016,7 +1016,7 @@ def render_meeting07():
                 if stage_picks not in ("All 27 steps", label):
                     continue
                 with st.expander(label, expanded=(stage_picks == label)):
-                    st.markdown("**What we did**")
+                    st.markdown("**What was done**")
                     st.write(methods)
                     st.markdown("**What the saved notebook shows**")
                     st.write(results)
