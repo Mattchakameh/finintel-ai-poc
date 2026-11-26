@@ -1010,10 +1010,23 @@ def render_meeting07():
             st.subheader("Colab v4 · complete walkthrough")
             st.caption("27 steps across all 62 cells: 30 explanatory cells and 32 code cells. This view reads the existing notebook; it does not run new experiments.")
             st.info("Follow the steps in order. Code and saved outputs are shown separately from interpretation. The full private notebook keeps its existing access controls.")
-            stage_picks = st.selectbox("Jump to a notebook step", ["All 27 steps"] + [f"Step {n:02d} · {title}" for n, title, *_ in MEETING07_STAGES])
+            st.markdown("### Results highlights")
+            st.markdown("**Step 16 · Verified OCR:** 1,302 of 1,302 printed headers read correctly on original-test crops. This is transcription, not answer accuracy.")
+            st.markdown("**Corrected OCR rerun · Separate fresh panel:** C averaged 95.00 and D 97.67 correct out of 102 across three seeds (+2.61 percentage points; 95% CI −1.85 to +10.10). The difference does not establish that D is better.")
+            st.table([
+                {"Step": "19", "Result to review": "Original master table: old OCR jump (C 29 → 98 out of 102)", "How to read it": "Historical, affected by answer-key date leakage; not an OCR-only gain"},
+                {"Step": "20", "Result to review": "Three-seed C vs. D on the original panel", "How to read it": "Historical OCR + ISO; affected by date leakage"},
+                {"Step": "23", "Result to review": "Nine Model D gate variants", "How to read it": "Historical OCR + ISO; affected by date leakage"},
+                {"Step": "25", "Result to review": "Frozen ViT vs. ViT + OCR-similarity gate", "How to read it": "Historical diagnostic; inputs were unequal"},
+                {"Step": "26", "Result to review": "62 of 62 stored-report checks matched", "How to read it": "Archive verification only; no model rerun"},
+            ])
+            highlighted = {16, 19, 20, 23, 25, 26}
+            stage_picks = st.selectbox("Jump to a notebook step", ["All 27 steps", "Highlighted result steps"] + [f"Step {n:02d} · {title}" for n, title, *_ in MEETING07_STAGES])
             for n, title, methods, results, scope, cells in MEETING07_STAGES:
                 label = f"Step {n:02d} · {title}"
-                if stage_picks not in ("All 27 steps", label):
+                if stage_picks == "Highlighted result steps" and n not in highlighted:
+                    continue
+                if stage_picks not in ("All 27 steps", "Highlighted result steps", label):
                     continue
                 with st.expander(label, expanded=(stage_picks == label)):
                     st.markdown("**What was done**")
