@@ -225,7 +225,7 @@ def render_meeting07():
     st.title("FinIntel AI | Meeting 07")
     st.caption("Advisor requests and a separate SEC extraction pilot")
     st.info("These are development results. The planned independent test has not run.")
-    requests_tab, pilot_tab = st.tabs(["Requests 1–6", "Colab evidence · 36 companies"])
+    requests_tab, pilot_tab = st.tabs(["Requests 1–7", "Colab evidence · 36 companies"])
 
     def show_evidence(caption, code, output):
         st.markdown(f"**{caption}**")
@@ -234,15 +234,71 @@ def render_meeting07():
         st.caption("Saved output or verified audit result")
         st.code(output, language="text")
 
+    def score_chart(rows, measure, denominator=None):
+        data = pd.DataFrame(rows, columns=["Group", measure])
+        encoding = {
+            "y": {"field": "Group", "type": "nominal", "sort": None, "title": None},
+            "x": {"field": measure, "type": "quantitative", "title": measure},
+            "tooltip": [{"field": "Group"}, {"field": measure, "type": "quantitative"}],
+        }
+        if denominator is not None:
+            encoding["x"]["scale"] = {"domain": [0, denominator]}
+        st.vega_lite_chart(
+            data,
+            {
+                "height": {"step": 27},
+                "layer": [
+                    {"mark": {"type": "bar", "color": "#176B87"}, "encoding": encoding},
+                    {"mark": {"type": "text", "align": "right", "dx": -6, "color": "white"},
+                     "encoding": {**encoding, "text": {"field": measure, "type": "quantitative", "format": ".2f" if any(isinstance(value, float) for _, value in rows) else "d"}}},
+                ],
+            },
+            use_container_width=True,
+        )
+
+    measurements = {
+        1: (
+            [("Temporal selector", 105), ("Locked fusion", 105)],
+            "Correct out of 115", 115,
+            "Both counts remained unchanged in all 24 presentations of the same 115 questions.",
+        ),
+        2: (
+            [("Model C", 57), ("Model D", 62)], "Correct out of 96", 96,
+            "Same 96 Validation questions and fixed epoch 5. The paired difference was not statistically significant.",
+        ),
+        3: (
+            [("Model C", 6), ("Model D", 4)], "Exact cells out of 32", 32,
+            "Archived 224 px run, eight companies. The reported 336 px check had the same counts, but its exact runner was not recovered.",
+        ),
+        4: (
+            [("Correct", 150), ("Answered", 162)], "Variants out of 192", 192,
+            "Standalone four-choice rule only. In the separate option-free extraction task, C got 6/32 and D got 4/32.",
+        ),
+        5: (
+            [("ICC .05", 93), ("ICC .10", 143), ("ICC .20", 242)],
+            "Companies required", None,
+            "Planning only: 25% paired discordance and 24 questions per company. The proposed target rounds 143 up to 144 companies.",
+        ),
+        6: (
+            [("Model C", 96), ("Model D", 96)], "Archived choices matched out of 96", 96,
+            "6B: replay agreement, not accuracy. 6A: zero tokens lost in 2,632 inputs (2,172 Train and 460 Validation).",
+        ),
+    }
+
     with requests_tab:
         st.caption("Each request has its original code or a relevant excerpt, its output, and what the result does and does not show.")
         for number, title, result, scope, blocks in MEETING07_EVIDENCE:
             st.subheader(f"Request {number} · {title}")
             st.markdown(f"**{result}**")
             st.write(scope)
+            rows, measure, denominator, chart_note = measurements[number]
+            score_chart(rows, measure, denominator)
+            st.caption(chart_note)
             with st.expander(f"Request {number} · Code and output", expanded=(number == 1)):
                 for caption, code, output in blocks:
                     show_evidence(caption, code, output)
+        st.subheader("Request 7 · Keep the presentation short")
+        st.write("This was a presentation request, not a model evaluation. The demo follows the request section, and detailed evidence remains separate from the main presentation.")
         st.divider()
         st.download_button(
             "Download the Colab evidence notebook",
@@ -265,6 +321,7 @@ def render_meeting07():
             {"Model": model, "Correct cells (out of 102)": count}
             for model, count in (("A", 8), ("B", 37), ("C", 29), ("D", 31))
         ])
+        score_chart([("Model A", 8), ("Model B", 37), ("Model C", 29), ("Model D", 31)], "Correct out of 102", 102)
         st.caption("The original 102-question panel. Step 26 checked these figures against the saved results.")
         st.markdown("**2. OCR recovered the printed headers**")
         st.write("Step 16: OCR read all 1,302 printed headers on the available original-test crops. This is transcription accuracy, not answer extraction accuracy.")
@@ -277,6 +334,7 @@ def render_meeting07():
             {"Model": "C", "Mean correct out of 102": 95.00},
             {"Model": "D", "Mean correct out of 102": 97.67},
         ])
+        score_chart([("Model C", 95.0), ("Model D", 97.67)], "Mean correct out of 102", 102)
         st.write("Separate fresh panel, three seeds. D was ahead by 2.61 percentage points (95% company-cluster interval: −1.85 to +10.10). That does not establish that D is better. This fresh-panel result is not a before-and-after comparison with the original value-only baseline.")
         st.caption("Source: corrected rerun audit. PCA is under evaluation.")
 
