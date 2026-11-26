@@ -33,6 +33,46 @@ st.set_page_config(
 # Meeting navigation
 # ============================================================
 
+
+def render_meeting07():
+    """Display saved, aggregate research results without exposing private files."""
+    st.title("FinIntel AI | Meeting 07")
+    st.caption("Advisor requests and a separate SEC extraction pilot")
+    st.info("These are development results. The planned independent test has not run.")
+    requests_tab, pilot_tab = st.tabs(["Requests 1–6", "Colab evidence · 36 companies"])
+    with requests_tab:
+        rows = [
+            ("1. Verify earlier results", "Changing the choice order did not change the saved Validation score. A simulated tie correctly returned no answer."),
+            ("2. Explain the extraction pilot", "On the same 96 Validation questions, C selected 57 correct cells and D selected 62. The difference was not statistically significant."),
+            ("3. Check sharper table images", "On the 32-question New8 check, sharper crops did not change the archived C and D results: 6 and 4 correct cells."),
+            ("4. Evaluate the balanced challenge", "The exact-cell result covers 32 base questions. The separate four-choice check used six variants per base question, not 192 independent questions."),
+            ("5. Plan the independent evaluation", "Set the scoring rule and sample-size plan before opening new company data."),
+            ("6. Check input coverage and replay", "Both CPU replays reproduced the archived C/D selections. Replaying a saved model is not retraining it."),
+        ]
+        for title, result in rows:
+            st.markdown(f"**{title}**")
+            st.write(result)
+    with pilot_tab:
+        st.subheader("A separate SEC pilot across 36 companies")
+        st.caption("Separate from the 96-question Validation set and the 32-question New8 check.")
+        counts = st.columns(3)
+        counts[0].metric("Train", "20 companies")
+        counts[1].metric("Validation", "8 companies")
+        counts[2].metric("Original test", "8 companies")
+        st.markdown("**Step 7 · Company split.** 480 questions after source checks: 275 Train, 103 Validation, 102 original test. No company was in two splits.")
+        st.markdown("**Step 16 · OCR.** OCR read 1,302 of 1,302 printed headers correctly on available original-test crops. This measures transcription, not extraction accuracy.")
+        st.markdown("**Step 11 · Early stopping.** For value-only D, Validation peaked at 42.72% at training round 20 and fell to 37.86% at round 25. The run kept the round-20 checkpoint.")
+        st.markdown("**Step 26 · Archived value-only test.** Correct cell selections out of 102, on the same questions for all four models:")
+        st.bar_chart({"Model A": [8], "Model B": [37], "Model C": [29], "Model D": [31]}, horizontal=True)
+        st.table([
+            {"Model": model, "Correct cells (out of 102)": count}
+            for model, count in (("A", 8), ("B", 37), ("C", 29), ("D", 31))
+        ])
+        st.markdown("**Separate fresh-panel check.** After removing the answer-key date from the inputs, C averaged 95.00 and D 97.67 correct out of 102 across three runs. The difference was +2.61 percentage points (95% interval: −1.85 to +10.10), so it does not establish that D is better.")
+        st.caption("Results that used the answer-key date are excluded. PCA is under evaluation.")
+
+
+
 dashboard_view = st.sidebar.radio(
     "FinIntel AI Research Dashboard",
     [
@@ -41,8 +81,9 @@ dashboard_view = st.sidebar.radio(
         "Meeting 04 — Multimodal Grounding & Fusion",
         "Meeting 05 — Grounding Audit & Diagnostics",
         "Meeting 06 — Readable Evidence & Next Steps",
+        "Meeting 07 — Controlled Evaluation",
     ],
-    index=4,
+    index=5 if st.query_params.get("meeting") == "7" else 4,
 )
 
 st.sidebar.caption(
@@ -51,6 +92,10 @@ st.sidebar.caption(
     "30 companies × 5 fiscal years × 6 financial concepts. "
     "Meeting 05 separates neural diagnostics from rule-based source extraction."
 )
+
+if dashboard_view == "Meeting 07 — Controlled Evaluation":
+    render_meeting07()
+    st.stop()
 
 if dashboard_view == "Meeting 06 — Readable Evidence & Next Steps":
     render_meeting06()
@@ -703,3 +748,4 @@ with tab_boundary:
         "-- far too small for a performance claim. This subset exists to validate "
         "that the pipeline runs end to end, not to evaluate it."
     )
+
