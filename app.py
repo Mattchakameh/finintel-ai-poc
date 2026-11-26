@@ -34,43 +34,259 @@ st.set_page_config(
 # ============================================================
 
 
+MEETING07_EVIDENCE = [(1,
+  'Verify earlier results',
+  '24 orders · 105/115 for each method · 0 decisions changed',
+  'Saved scores only. No inference on shuffled inputs and no protected test run.',
+  [('Original replay.py · all option orders and synthetic tie check',
+    'import itertools\n'
+    '\n'
+    'ORDERS=tuple(itertools.permutations(range(4)))\n'
+    '\n'
+    'def top(scores, order, abstain):\n'
+    '    high=max(scores[i] for i in order)\n'
+    '    winners=[i for i in order if scores[i]==high]\n'
+    '    return None if abstain and len(winners)>1 else winners[0]\n'
+    '\n'
+    "if __name__=='__main__':\n"
+    '    assert top([0.9,0.1,0.9,0.2],(0,1,2,3),False)==0\n'
+    '    assert top([0.9,0.1,0.9,0.2],(2,1,0,3),False)==2\n'
+    '    assert all(top([0.9,0.1,0.9,0.2],x,True) is None for x in ORDERS)\n'
+    '    assert all(top([0.1,0.3,0.9,0.2],x,True)==2 for x in ORDERS)',
+    'Temporal selector: 105/115 correct across 24 orders; 0 decisions changed.\n'
+    'Locked fusion: 105/115 correct across 24 orders; 0 decisions changed.\n'
+    'Synthetic tie: abstained in all 24 orders.')]),
+ (2,
+  'Explain the extraction pilot',
+  'Model C 57/96 · Model D 62/96 on the same Validation questions',
+  'Fixed epoch 5. Five more correct cells for D; the paired difference was not statistically '
+  'significant. The cell displays archived scores; it does not rerun the models.',
+  [('Original Colab · cell 3: Archived Validation results',
+    '# Display archived results only. Do not rerun the models.\n'
+    'print("Request 2 | Archived Validation results | fixed epoch 5")\n'
+    'for model in ("C", "D"):\n'
+    '    scores = results[model]["archived_fixed_epoch_5_metrics"]["Validation"]\n'
+    '    correct, total = scores["correct"], scores["denominator"]\n'
+    '    print(f"Model {model}: {correct}/{total} correct ({correct / total:.2%})")\n'
+    'print("Source: validation_curves.json | No model rerun in this notebook.")',
+    'Request 2 | Archived Validation results | fixed epoch 5\n'
+    'Model C: 57/96 correct (59.38%)\n'
+    'Model D: 62/96 correct (64.58%)\n'
+    'Source: validation_curves.json | No model rerun in this notebook.')]),
+ (3,
+  'Check sharper table images',
+  'Archived 224 px New8: C 6/32 · D 4/32',
+  'The original 224 px notebook recounts saved decisions. The separately reported 336 px run had '
+  'unchanged counts; its exact runner was not recovered by this notebook.',
+  [('Original Colab · cell 2: exact-cell scoring excerpt',
+    'issuers = sorted({issuer for issuer, _, _ in rows})\n'
+    'assert len(rows) == 32 and len(issuers) == 8\n'
+    'print("New8 | Archived 224 px frozen-checkpoint results")\n'
+    'print("Companies:", ", ".join(issuers))\n'
+    'print("Questions:", len(rows))\n'
+    'for i, model in enumerate(("C", "D"), start=1):\n'
+    '    print(f"Model {model}: {sum(row[i] for row in rows)}/{len(rows)} exact cells")\n'
+    'print("This cell recounts saved decisions; it does not run either model.")',
+    'New8 | Archived 224 px frozen-checkpoint results\n'
+    'Companies: ABBV, AOS, DE, DOV, PH, SWK, UPS, V\n'
+    'Questions: 32\n'
+    'Model C: 6/32 exact cells\n'
+    'Model D: 4/32 exact cells\n'
+    'This cell recounts saved decisions; it does not run either model.')]),
+ (4,
+  'Evaluate the balanced challenge',
+  '32 base questions × 6 variants · standalone rule: 150/192 correct',
+  'The four-choice rule answered 162/192. C and D took the separate 32-question exact-cell test, not '
+  'this four-choice test.',
+  [('Original Colab · cell 2: balance and scoring excerpt',
+    'from collections import Counter\n'
+    '\n'
+    '# Frozen labels and predictions, joined by example ID after prediction freeze.\n'
+    'variants_per_question = Counter(base for base, _, _, _ in rows)\n'
+    'positions = Counter("ABCD"[gold] for _, _, gold, _ in rows)\n'
+    'categories = Counter(kind for _, kind, _, _ in rows)\n'
+    'assert len(variants_per_question) == 32 and set(variants_per_question.values()) == {6}\n'
+    'assert positions == dict.fromkeys("ABCD", 48)\n'
+    'assert len(categories) == 6 and set(categories.values()) == {32}\n'
+    'correct = sum(gold == selected for _, _, gold, selected in rows)\n'
+    'answered = sum(selected is not None for _, _, _, selected in rows)\n'
+    'assert (correct, answered, len(rows)) == (150, 162, 192)\n'
+    'print(f"{len(variants_per_question)} base questions × 6 distractor types = {len(rows)} variants")\n'
+    'print("Correct positions:", dict(sorted(positions.items())))\n'
+    'print(f"Standalone rule: {correct}/{len(rows)} correct; {answered}/{len(rows)} answered.")\n'
+    'print("C and D did not take this four-choice test.")',
+    '32 base questions × 6 distractor types = 192 variants\n'
+    "Correct positions: {'A': 48, 'B': 48, 'C': 48, 'D': 48}\n"
+    'Standalone rule: 150/192 correct; 162/192 answered.\n'
+    'C and D did not take this four-choice test.')]),
+ (5,
+  'Plan the independent evaluation',
+  'Planning target: 144 companies × 24 questions = 3,456',
+  'This estimates sample size under stated assumptions, not accuracy. The independent test has not run.',
+  [('Original Colab · sample-size calculation (complete cell)',
+    'from math import ceil, sqrt\n'
+    'from statistics import NormalDist\n'
+    '\n'
+    'FAMILY_ALPHA = 0.05\n'
+    'TEST_COUNT = 3\n'
+    'TARGET_POWER = 0.80\n'
+    'MINIMUM_GAIN = 0.05\n'
+    'QUESTIONS_PER_ISSUER = 24\n'
+    'TARGET_ISSUERS = 144\n'
+    'normal = NormalDist()\n'
+    'critical = normal.inv_cdf(1 - FAMILY_ALPHA / (2 * TEST_COUNT))\n'
+    'z_power = normal.inv_cdf(TARGET_POWER)\n'
+    '\n'
+    'def required_issuers(paired_discordance, issuer_icc):\n'
+    '    variance = paired_discordance - MINIMUM_GAIN ** 2\n'
+    '    design_effect = 1 + (QUESTIONS_PER_ISSUER - 1) * issuer_icc\n'
+    '    questions = (critical + z_power)**2 * variance * design_effect / MINIMUM_GAIN**2\n'
+    '    return ceil(questions / QUESTIONS_PER_ISSUER)\n'
+    '\n'
+    'if __name__ == "__main__":\n'
+    '    pilot_q = (12 + 7) / 96\n'
+    '    print(f"Historical extraction discordance (planning proxy only): {pilot_q:.4f}")\n'
+    '    for q, rho in [(0.25, 0.05), (0.25, 0.10), (0.25, 0.20), (0.35, 0.10)]:\n'
+    '        print(f"q={q:.2f}, ICC={rho:.2f}: {required_issuers(q, rho)} issuers")\n'
+    '    assert required_issuers(0.25, 0.10) == 143\n'
+    '    print(f"Proposed target: {TARGET_ISSUERS} issuers × {QUESTIONS_PER_ISSUER} = "\n'
+    '          f"{TARGET_ISSUERS * QUESTIONS_PER_ISSUER} questions.")',
+    'Historical extraction discordance (planning proxy only): 0.1979\n'
+    'q=0.25, ICC=0.05: 93 issuers\n'
+    'q=0.25, ICC=0.10: 143 issuers\n'
+    'q=0.25, ICC=0.20: 242 issuers\n'
+    'q=0.35, ICC=0.10: 201 issuers\n'
+    'Proposed target: 144 issuers × 24 = 3456 questions.')]),
+ (6,
+  'Check input coverage and replay',
+  '6A: 0 tokens dropped across 2,632 inputs · 6B: 192/192 saved choices matched',
+  'The archived replay and the corrected-input coverage check are separate. This is not a new training '
+  'run.',
+  [('Original Colab · cell 17: 6A input-coverage checks',
+    'source_archive = INPUTS / "FinIntel_sourcefix5_v1_Data_and_Proof.zip"\n'
+    'print(run("test_gate.py", source_archive).strip())\n'
+    'coverage = json.loads(run("window_audit.py", source_archive, INPUTS / "tokenizer"))\n'
+    'print(json.dumps(coverage, indent=2))\n'
+    'assert coverage["windows_per_option"] == {\n'
+    '    "Train": {"1": 2156, "3": 16}, "Validation": {"1": 456, "3": 4}\n'
+    '}\n'
+    'assert coverage["source_tokens_dropped"] == 0\n'
+    'assert coverage["unequal_window_count_within_target"] == 0\n'
+    'assert coverage["model_ready"] is False',
+    'Verified local CPU output (not a Colab execution):\n'
+    'PASS: immutable SHA-pinned input; byte tamper rejected; model admission denied with no model '
+    'payload\n'
+    '{\n'
+    '  "windows_per_option": {\n'
+    '    "Train": {\n'
+    '      "1": 2156,\n'
+    '      "3": 16\n'
+    '    },\n'
+    '    "Validation": {\n'
+    '      "1": 456,\n'
+    '      "3": 4\n'
+    '    }\n'
+    '  },\n'
+    '  "unequal_window_count_within_target": 0,\n'
+    '  "source_tokens_dropped": 0,\n'
+    '  "model_ready": false\n'
+    '}'),
+   ('Original Colab · cell 20: 6B two-run replay excerpt',
+    '    with TemporaryDirectory(prefix="finintel-r6-") as folder:\n'
+    '        outputs = []\n'
+    '        for label in ("first", "second"):\n'
+    '            destination = Path(folder) / label\n'
+    '            run("replay_archived.py", *args, "--out", destination)\n'
+    '            outputs.append({\n'
+    '                file.name: file.read_bytes()\n'
+    '                for file in (destination / "fixed_checkpoint_inference").glob("*.json")\n'
+    '            })\n'
+    '        assert len(outputs[0]) == 7 and outputs[0] == outputs[1], "Replay files differ"\n'
+    '        summary = json.loads(outputs[0]["summary.json"])\n'
+    '\n'
+    '    for model in ("C", "D"):\n'
+    '        score = summary["metrics"]["archived_global"][model]\n'
+    '        check = summary["comparisons"][model]\n'
+    '        assert check["historical_cell_decisions_agree"] == score["denominator"] == 96\n'
+    '        print(f"{model}: {score[\'correct\']}/96 correct; 96/96 archived selections matched; "\n'
+    '              f"maximum historical logit delta = '
+    '{check[\'historical_max_abs_logit_delta\']:.9g}")\n'
+    '    print("Two deterministic reruns: all seven replay JSON files are byte-identical.")\n'
+    '    Path("request6_historical_replay_summary.json").write_text(json.dumps(summary, indent=2))',
+    'Verified local CPU output (not a Colab execution):\n'
+    'Verified prior CPU replay: C 57/96, D 62/96; 192/192 archived choices matched.\n'
+    'This is a summary of the prior run, not a new result.')])]
+MEETING07_OCR = ('print("OCR read accuracy (480x128, found crops only):")\nfor split in ["train", "validation", "test"]:\n    s = ocr["ocr_accuracy_per_split"][split]["480"]\n    print(f"  {split:<11} header exact {s[\'header_exact_acc\']:.0%} "\n          f"({s[\'header_exact\']}/{s[\'n_found\']}), "\n          f"year printed {s[\'year_printed_acc\']:.0%}, "\n          f"row prefix-12 {s[\'row_prefix12_acc\']:.0%}")', 'OCR read accuracy (480x128, found crops only):\n  train       header exact 100% (3823/3823), year printed 100%, row prefix-12 100%\n  validation  header exact 100% (1351/1351), year printed 100%, row prefix-12 100%\n  test        header exact 100% (1302/1302), year printed 100%, row prefix-12 100%')
+MEETING07_PILOT_ARCHIVE = [('Step 19 · Master comparison: value-only to OCR headers (historical)', 'Same 102 original-panel questions. The old OCR experiment changed the inputs and later audit identified an answer-key-derived date. The apparent gain is not an OCR-only effect or a valid headline result.', '    ("Original pilot, value-only features", "A", int(round(pilot["model_A"]["exact_cell"] * 102))),\n    ("Original pilot, value-only features", "B", int(round(pilot["model_B"]["exact_cell"] * 102))),\n    ("Original pilot, value-only features", "C", int(round(pilot["model_C"]["exact_cell"] * 102))),\n    ("Original pilot, value-only features", "D", int(round(pilot["model_D"]["exact_cell"] * 102))),\n    ("OCR headers (RapidOCR, no training)", "B", ocr["heads"]["B_ocr"]["test"]["correct"]),\n    ("OCR headers (RapidOCR, no training)", "C", ocr["heads"]["C_ocr"]["test"]["correct"]),\n    ("OCR headers (RapidOCR, no training)", "D", ocr["heads"]["D_ocr"]["test"]["correct"]),', '  Original pilot, value-only features    model A:   8/102 (7.84%)\n  Original pilot, value-only features    model B:  37/102 (36.27%)\n  Original pilot, value-only features    model C:  29/102 (28.43%)\n  Original pilot, value-only features    model D:  31/102 (30.39%)\n  OCR headers (RapidOCR, no training)    model B:  86/102 (84.31%)\n  OCR headers (RapidOCR, no training)    model C:  98/102 (96.08%)\n  OCR headers (RapidOCR, no training)    model D:  74/102 (72.55%)'), ('Step 20 · OCR + ISO, three-seed C/D (historical; date leakage)', 'Original panel, 102 questions per seed. The exact fiscal year-end feature used the answer key; these are not valid test results.', 'three = json.loads((PILOT_DIR / "three_seed_c_d_results.json").read_text())\n# Saved output for the three-seed check is shown below.', 'Three seeds, OCR headers + ISO, test (102 questions, full-tuple):\n  Seed       C     D     D-C\n  11        99    96   -2.94 pp\n  22        95    97   +1.96 pp\n  33        99    95   -3.92 pp\n  mean   97.67 96.00   -1.63 pp'), ('Step 23 · Nine Model D gate variants (historical; date leakage)', 'The provided Colab cell shows similarity and FinBERT variants, not ConvLSTM. These scores use the affected date feature and are excluded from performance comparisons.', 'hdr = f"{\'Variant\':<26}{\'Val/103\':>8}{\'Orig D\':>16}{\'Orig D-C pp\':>14}{\'Fresh D\':>16}{\'Fresh D-C pp\':>14}"\nprint(hdr)\nfor name, v in gate["variants"].items():\n    o = v["summary_original"]["all"]\n    f = v["summary_fresh"]["all"]\n    print(f"{name:<26}{v[\'val_mean_over_103\']:>8.2f}"\n          f"{str(o[\'D_per_seed\']):>16}{o[\'mean_diff_pp\']:>+13.2f} pp"\n          f"{str(f[\'D_per_seed\']):>16}{f[\'mean_diff_pp\']:>+13.2f} pp")\nprint()', 'Saved-output header: Gate improvement: 9 variants, seeds 11/22/33, OCR headers + ISO, test n = 102 per panel, full-tuple. C reference is fixed (not retrained).\nAffected accuracy rows withheld.'), ('Step 25 · Frozen ViT vs. ViT + OCR-similarity gate (historical diagnostic)', 'Each panel has 102 questions per seed. Only D gets the OCR similarity inputs; this does not isolate the learned gate or the image contribution. The date provenance of this old result was not certified for the corrected analysis.', 's = vit["summary_D_vit_shrink0.5_vs_C_vit"]\nprint("ViT pixels + OCR-similarity gate (D_sim_shrink0.5), test n = 102:")\nfor panel in ["original", "fresh"]:\n    a = s[panel]["all"]\n    print(f"  {panel:<8} C_vit {a[\'C_per_seed\']} (mean {a[\'C_mean_sd\'][\'mean\']:.2f}), "\n          f"D_vit {a[\'D_per_seed\']} (mean {a[\'D_mean_sd\'][\'mean\']:.2f}), "\n          f"mean D-C {a[\'mean_diff_pp\']:+.2f} pp, 95% CI "\n          f"{a[\'mean_diff_bootstrap_ci95_pp\']} pp")\n    ao = s[panel]["answerable_only"]\n    print(f"           answerable-only: mean D-C {ao[\'mean_diff_pp\']:+.2f} pp, "', 'ViT pixels + OCR-similarity gate (D_sim_shrink0.5), test n = 102:\n  original C_vit [31, 31, 37] (mean 33.00), D_vit [67, 68, 78] (mean 71.00), mean D-C +37.25 pp, 95% CI [26.14, 48.05] pp\n  fresh    C_vit [39, 38, 40] (mean 39.00), D_vit [74, 74, 81] (mean 76.33), mean D-C +36.60 pp, 95% CI [25.49, 47.39] pp'), ('Step 26 · Cross-checking stored results', '62/62 checks matched the stored reports. This does not rerun inference or certify whether an earlier model’s input contained leaked features.', 'def check(label, got, want, tol=0.0005):\n    if isinstance(want, list):\n        ok = (len(got) == len(want)\n              and all(abs(g - w) <= tol for g, w in zip(got, want)))\n    else:\n        ok = (got == want) if tol == 0 else abs(got - want) <= tol\n    checks.append((label, got, want, ok))', 'OK   model_A original pilot                 got 0.0784313725490196 want 0.0784313725490196\n  OK   model_B original pilot                 got 0.3627450980392157 want 0.3627450980392157\n  OK   model_C original pilot                 got 0.28431372549019607 want 0.28431372549019607\n  OK   model_D original pilot                 got 0.30392156862745096 want 0.30392156862745096\n62 checks, 62 passed.')]
+MEETING07_NOTEBOOK = '{\n "nbformat": 4,\n "nbformat_minor": 4,\n "metadata": {\n  "kernelspec": {\n   "display_name": "Python 3",\n   "language": "python",\n   "name": "python3"\n  }\n },\n "cells": [\n  {\n   "cell_type": "markdown",\n   "metadata": {},\n   "source": [\n    "# Meeting 7 evidence excerpts\\n",\n    "\\n",\n    "Read-only evidence. Most code excerpts need the private source inputs and are not standalone. The Request 5 power calculation is a complete runnable cell."\n   ]\n  },\n  {\n   "cell_type": "markdown",\n   "metadata": {},\n   "source": [\n    "## Request 1: Verify earlier results\\n",\n    "\\n",\n    "24 orders \\u00b7 105/115 for each method \\u00b7 0 decisions changed\\n",\n    "\\n",\n    "Saved scores only. No inference on shuffled inputs and no protected test run."\n   ]\n  },\n  {\n   "cell_type": "markdown",\n   "metadata": {},\n   "source": [\n    "### Original replay.py \\u00b7 all option orders and synthetic tie check\\n",\n    "\\n",\n    "```python\\n",\n    "import itertools\\n",\n    "\\n",\n    "ORDERS=tuple(itertools.permutations(range(4)))\\n",\n    "\\n",\n    "def top(scores, order, abstain):\\n",\n    "    high=max(scores[i] for i in order)\\n",\n    "    winners=[i for i in order if scores[i]==high]\\n",\n    "    return None if abstain and len(winners)>1 else winners[0]\\n",\n    "\\n",\n    "if __name__==\'__main__\':\\n",\n    "    assert top([0.9,0.1,0.9,0.2],(0,1,2,3),False)==0\\n",\n    "    assert top([0.9,0.1,0.9,0.2],(2,1,0,3),False)==2\\n",\n    "    assert all(top([0.9,0.1,0.9,0.2],x,True) is None for x in ORDERS)\\n",\n    "    assert all(top([0.1,0.3,0.9,0.2],x,True)==2 for x in ORDERS)\\n",\n    "```\\n",\n    "\\n",\n    "Saved or previously verified output:\\n",\n    "\\n",\n    "```text\\n",\n    "Temporal selector: 105/115 correct across 24 orders; 0 decisions changed.\\n",\n    "Locked fusion: 105/115 correct across 24 orders; 0 decisions changed.\\n",\n    "Synthetic tie: abstained in all 24 orders.\\n",\n    "```"\n   ]\n  },\n  {\n   "cell_type": "markdown",\n   "metadata": {},\n   "source": [\n    "## Request 2: Explain the extraction pilot\\n",\n    "\\n",\n    "Model C 57/96 \\u00b7 Model D 62/96 on the same Validation questions\\n",\n    "\\n",\n    "Fixed epoch 5. Five more correct cells for D; the paired difference was not statistically significant. The cell displays archived scores; it does not rerun the models."\n   ]\n  },\n  {\n   "cell_type": "markdown",\n   "metadata": {},\n   "source": [\n    "### Original Colab \\u00b7 cell 3: Archived Validation results\\n",\n    "\\n",\n    "```python\\n",\n    "# Display archived results only. Do not rerun the models.\\n",\n    "print(\\"Request 2 | Archived Validation results | fixed epoch 5\\")\\n",\n    "for model in (\\"C\\", \\"D\\"):\\n",\n    "    scores = results[model][\\"archived_fixed_epoch_5_metrics\\"][\\"Validation\\"]\\n",\n    "    correct, total = scores[\\"correct\\"], scores[\\"denominator\\"]\\n",\n    "    print(f\\"Model {model}: {correct}/{total} correct ({correct / total:.2%})\\")\\n",\n    "print(\\"Source: validation_curves.json | No model rerun in this notebook.\\")\\n",\n    "```\\n",\n    "\\n",\n    "Saved or previously verified output:\\n",\n    "\\n",\n    "```text\\n",\n    "Request 2 | Archived Validation results | fixed epoch 5\\n",\n    "Model C: 57/96 correct (59.38%)\\n",\n    "Model D: 62/96 correct (64.58%)\\n",\n    "Source: validation_curves.json | No model rerun in this notebook.\\n",\n    "```"\n   ]\n  },\n  {\n   "cell_type": "markdown",\n   "metadata": {},\n   "source": [\n    "## Request 3: Check sharper table images\\n",\n    "\\n",\n    "Archived 224 px New8: C 6/32 \\u00b7 D 4/32\\n",\n    "\\n",\n    "The original 224 px notebook recounts saved decisions. The separately reported 336 px run had unchanged counts; its exact runner was not recovered by this notebook."\n   ]\n  },\n  {\n   "cell_type": "markdown",\n   "metadata": {},\n   "source": [\n    "### Original Colab \\u00b7 cell 2: exact-cell scoring excerpt\\n",\n    "\\n",\n    "```python\\n",\n    "issuers = sorted({issuer for issuer, _, _ in rows})\\n",\n    "assert len(rows) == 32 and len(issuers) == 8\\n",\n    "print(\\"New8 | Archived 224 px frozen-checkpoint results\\")\\n",\n    "print(\\"Companies:\\", \\", \\".join(issuers))\\n",\n    "print(\\"Questions:\\", len(rows))\\n",\n    "for i, model in enumerate((\\"C\\", \\"D\\"), start=1):\\n",\n    "    print(f\\"Model {model}: {sum(row[i] for row in rows)}/{len(rows)} exact cells\\")\\n",\n    "print(\\"This cell recounts saved decisions; it does not run either model.\\")\\n",\n    "```\\n",\n    "\\n",\n    "Saved or previously verified output:\\n",\n    "\\n",\n    "```text\\n",\n    "New8 | Archived 224 px frozen-checkpoint results\\n",\n    "Companies: ABBV, AOS, DE, DOV, PH, SWK, UPS, V\\n",\n    "Questions: 32\\n",\n    "Model C: 6/32 exact cells\\n",\n    "Model D: 4/32 exact cells\\n",\n    "This cell recounts saved decisions; it does not run either model.\\n",\n    "```"\n   ]\n  },\n  {\n   "cell_type": "markdown",\n   "metadata": {},\n   "source": [\n    "## Request 4: Evaluate the balanced challenge\\n",\n    "\\n",\n    "32 base questions \\u00d7 6 variants \\u00b7 standalone rule: 150/192 correct\\n",\n    "\\n",\n    "The four-choice rule answered 162/192. C and D took the separate 32-question exact-cell test, not this four-choice test."\n   ]\n  },\n  {\n   "cell_type": "markdown",\n   "metadata": {},\n   "source": [\n    "### Original Colab \\u00b7 cell 2: balance and scoring excerpt\\n",\n    "\\n",\n    "```python\\n",\n    "from collections import Counter\\n",\n    "\\n",\n    "# Frozen labels and predictions, joined by example ID after prediction freeze.\\n",\n    "variants_per_question = Counter(base for base, _, _, _ in rows)\\n",\n    "positions = Counter(\\"ABCD\\"[gold] for _, _, gold, _ in rows)\\n",\n    "categories = Counter(kind for _, kind, _, _ in rows)\\n",\n    "assert len(variants_per_question) == 32 and set(variants_per_question.values()) == {6}\\n",\n    "assert positions == dict.fromkeys(\\"ABCD\\", 48)\\n",\n    "assert len(categories) == 6 and set(categories.values()) == {32}\\n",\n    "correct = sum(gold == selected for _, _, gold, selected in rows)\\n",\n    "answered = sum(selected is not None for _, _, _, selected in rows)\\n",\n    "assert (correct, answered, len(rows)) == (150, 162, 192)\\n",\n    "print(f\\"{len(variants_per_question)} base questions \\u00d7 6 distractor types = {len(rows)} variants\\")\\n",\n    "print(\\"Correct positions:\\", dict(sorted(positions.items())))\\n",\n    "print(f\\"Standalone rule: {correct}/{len(rows)} correct; {answered}/{len(rows)} answered.\\")\\n",\n    "print(\\"C and D did not take this four-choice test.\\")\\n",\n    "```\\n",\n    "\\n",\n    "Saved or previously verified output:\\n",\n    "\\n",\n    "```text\\n",\n    "32 base questions \\u00d7 6 distractor types = 192 variants\\n",\n    "Correct positions: {\'A\': 48, \'B\': 48, \'C\': 48, \'D\': 48}\\n",\n    "Standalone rule: 150/192 correct; 162/192 answered.\\n",\n    "C and D did not take this four-choice test.\\n",\n    "```"\n   ]\n  },\n  {\n   "cell_type": "markdown",\n   "metadata": {},\n   "source": [\n    "## Request 5: Plan the independent evaluation\\n",\n    "\\n",\n    "Planning target: 144 companies \\u00d7 24 questions = 3,456\\n",\n    "\\n",\n    "This estimates sample size under stated assumptions, not accuracy. The independent test has not run."\n   ]\n  },\n  {\n   "cell_type": "markdown",\n   "metadata": {},\n   "source": [\n    "### Original Colab \\u00b7 sample-size calculation (complete cell)\\n",\n    "\\n",\n    "```python\\n",\n    "from math import ceil, sqrt\\n",\n    "from statistics import NormalDist\\n",\n    "\\n",\n    "FAMILY_ALPHA = 0.05\\n",\n    "TEST_COUNT = 3\\n",\n    "TARGET_POWER = 0.80\\n",\n    "MINIMUM_GAIN = 0.05\\n",\n    "QUESTIONS_PER_ISSUER = 24\\n",\n    "TARGET_ISSUERS = 144\\n",\n    "normal = NormalDist()\\n",\n    "critical = normal.inv_cdf(1 - FAMILY_ALPHA / (2 * TEST_COUNT))\\n",\n    "z_power = normal.inv_cdf(TARGET_POWER)\\n",\n    "\\n",\n    "def required_issuers(paired_discordance, issuer_icc):\\n",\n    "    variance = paired_discordance - MINIMUM_GAIN ** 2\\n",\n    "    design_effect = 1 + (QUESTIONS_PER_ISSUER - 1) * issuer_icc\\n",\n    "    questions = (critical + z_power)**2 * variance * design_effect / MINIMUM_GAIN**2\\n",\n    "    return ceil(questions / QUESTIONS_PER_ISSUER)\\n",\n    "\\n",\n    "if __name__ == \\"__main__\\":\\n",\n    "    pilot_q = (12 + 7) / 96\\n",\n    "    print(f\\"Historical extraction discordance (planning proxy only): {pilot_q:.4f}\\")\\n",\n    "    for q, rho in [(0.25, 0.05), (0.25, 0.10), (0.25, 0.20), (0.35, 0.10)]:\\n",\n    "        print(f\\"q={q:.2f}, ICC={rho:.2f}: {required_issuers(q, rho)} issuers\\")\\n",\n    "    assert required_issuers(0.25, 0.10) == 143\\n",\n    "    print(f\\"Proposed target: {TARGET_ISSUERS} issuers \\u00d7 {QUESTIONS_PER_ISSUER} = \\"\\n",\n    "          f\\"{TARGET_ISSUERS * QUESTIONS_PER_ISSUER} questions.\\")\\n",\n    "```\\n",\n    "\\n",\n    "Saved or previously verified output:\\n",\n    "\\n",\n    "```text\\n",\n    "Historical extraction discordance (planning proxy only): 0.1979\\n",\n    "q=0.25, ICC=0.05: 93 issuers\\n",\n    "q=0.25, ICC=0.10: 143 issuers\\n",\n    "q=0.25, ICC=0.20: 242 issuers\\n",\n    "q=0.35, ICC=0.10: 201 issuers\\n",\n    "Proposed target: 144 issuers \\u00d7 24 = 3456 questions.\\n",\n    "```"\n   ]\n  },\n  {\n   "cell_type": "code",\n   "execution_count": null,\n   "metadata": {},\n   "outputs": [],\n   "source": [\n    "from math import ceil, sqrt\\n",\n    "from statistics import NormalDist\\n",\n    "\\n",\n    "FAMILY_ALPHA = 0.05\\n",\n    "TEST_COUNT = 3\\n",\n    "TARGET_POWER = 0.80\\n",\n    "MINIMUM_GAIN = 0.05\\n",\n    "QUESTIONS_PER_ISSUER = 24\\n",\n    "TARGET_ISSUERS = 144\\n",\n    "normal = NormalDist()\\n",\n    "critical = normal.inv_cdf(1 - FAMILY_ALPHA / (2 * TEST_COUNT))\\n",\n    "z_power = normal.inv_cdf(TARGET_POWER)\\n",\n    "\\n",\n    "def required_issuers(paired_discordance, issuer_icc):\\n",\n    "    variance = paired_discordance - MINIMUM_GAIN ** 2\\n",\n    "    design_effect = 1 + (QUESTIONS_PER_ISSUER - 1) * issuer_icc\\n",\n    "    questions = (critical + z_power)**2 * variance * design_effect / MINIMUM_GAIN**2\\n",\n    "    return ceil(questions / QUESTIONS_PER_ISSUER)\\n",\n    "\\n",\n    "if __name__ == \\"__main__\\":\\n",\n    "    pilot_q = (12 + 7) / 96\\n",\n    "    print(f\\"Historical extraction discordance (planning proxy only): {pilot_q:.4f}\\")\\n",\n    "    for q, rho in [(0.25, 0.05), (0.25, 0.10), (0.25, 0.20), (0.35, 0.10)]:\\n",\n    "        print(f\\"q={q:.2f}, ICC={rho:.2f}: {required_issuers(q, rho)} issuers\\")\\n",\n    "    assert required_issuers(0.25, 0.10) == 143\\n",\n    "    print(f\\"Proposed target: {TARGET_ISSUERS} issuers \\u00d7 {QUESTIONS_PER_ISSUER} = \\"\\n",\n    "          f\\"{TARGET_ISSUERS * QUESTIONS_PER_ISSUER} questions.\\")"\n   ]\n  },\n  {\n   "cell_type": "markdown",\n   "metadata": {},\n   "source": [\n    "## Request 6: Check input coverage and replay\\n",\n    "\\n",\n    "6A: 0 tokens dropped across 2,632 inputs \\u00b7 6B: 192/192 saved choices matched\\n",\n    "\\n",\n    "The archived replay and the corrected-input coverage check are separate. This is not a new training run."\n   ]\n  },\n  {\n   "cell_type": "markdown",\n   "metadata": {},\n   "source": [\n    "### Original Colab \\u00b7 cell 17: 6A input-coverage checks\\n",\n    "\\n",\n    "```python\\n",\n    "source_archive = INPUTS / \\"FinIntel_sourcefix5_v1_Data_and_Proof.zip\\"\\n",\n    "print(run(\\"test_gate.py\\", source_archive).strip())\\n",\n    "coverage = json.loads(run(\\"window_audit.py\\", source_archive, INPUTS / \\"tokenizer\\"))\\n",\n    "print(json.dumps(coverage, indent=2))\\n",\n    "assert coverage[\\"windows_per_option\\"] == {\\n",\n    "    \\"Train\\": {\\"1\\": 2156, \\"3\\": 16}, \\"Validation\\": {\\"1\\": 456, \\"3\\": 4}\\n",\n    "}\\n",\n    "assert coverage[\\"source_tokens_dropped\\"] == 0\\n",\n    "assert coverage[\\"unequal_window_count_within_target\\"] == 0\\n",\n    "assert coverage[\\"model_ready\\"] is False\\n",\n    "```\\n",\n    "\\n",\n    "Saved or previously verified output:\\n",\n    "\\n",\n    "```text\\n",\n    "Verified local CPU output (not a Colab execution):\\n",\n    "PASS: immutable SHA-pinned input; byte tamper rejected; model admission denied with no model payload\\n",\n    "{\\n",\n    "  \\"windows_per_option\\": {\\n",\n    "    \\"Train\\": {\\n",\n    "      \\"1\\": 2156,\\n",\n    "      \\"3\\": 16\\n",\n    "    },\\n",\n    "    \\"Validation\\": {\\n",\n    "      \\"1\\": 456,\\n",\n    "      \\"3\\": 4\\n",\n    "    }\\n",\n    "  },\\n",\n    "  \\"unequal_window_count_within_target\\": 0,\\n",\n    "  \\"source_tokens_dropped\\": 0,\\n",\n    "  \\"model_ready\\": false\\n",\n    "}\\n",\n    "```"\n   ]\n  },\n  {\n   "cell_type": "markdown",\n   "metadata": {},\n   "source": [\n    "### Original Colab \\u00b7 cell 20: 6B two-run replay excerpt\\n",\n    "\\n",\n    "```python\\n",\n    "    with TemporaryDirectory(prefix=\\"finintel-r6-\\") as folder:\\n",\n    "        outputs = []\\n",\n    "        for label in (\\"first\\", \\"second\\"):\\n",\n    "            destination = Path(folder) / label\\n",\n    "            run(\\"replay_archived.py\\", *args, \\"--out\\", destination)\\n",\n    "            outputs.append({\\n",\n    "                file.name: file.read_bytes()\\n",\n    "                for file in (destination / \\"fixed_checkpoint_inference\\").glob(\\"*.json\\")\\n",\n    "            })\\n",\n    "        assert len(outputs[0]) == 7 and outputs[0] == outputs[1], \\"Replay files differ\\"\\n",\n    "        summary = json.loads(outputs[0][\\"summary.json\\"])\\n",\n    "\\n",\n    "    for model in (\\"C\\", \\"D\\"):\\n",\n    "        score = summary[\\"metrics\\"][\\"archived_global\\"][model]\\n",\n    "        check = summary[\\"comparisons\\"][model]\\n",\n    "        assert check[\\"historical_cell_decisions_agree\\"] == score[\\"denominator\\"] == 96\\n",\n    "        print(f\\"{model}: {score[\'correct\']}/96 correct; 96/96 archived selections matched; \\"\\n",\n    "              f\\"maximum historical logit delta = {check[\'historical_max_abs_logit_delta\']:.9g}\\")\\n",\n    "    print(\\"Two deterministic reruns: all seven replay JSON files are byte-identical.\\")\\n",\n    "    Path(\\"request6_historical_replay_summary.json\\").write_text(json.dumps(summary, indent=2))\\n",\n    "```\\n",\n    "\\n",\n    "Saved or previously verified output:\\n",\n    "\\n",\n    "```text\\n",\n    "Verified local CPU output (not a Colab execution):\\n",\n    "Verified prior CPU replay: C 57/96, D 62/96; 192/192 archived choices matched.\\n",\n    "This is a summary of the prior run, not a new result.\\n",\n    "```"\n   ]\n  }\n ]\n}'
+
 def render_meeting07():
-    """Display saved, aggregate research results without exposing private files."""
+    """Show original code excerpts and aggregate outputs alongside their scope."""
     st.title("FinIntel AI | Meeting 07")
     st.caption("Advisor requests and a separate SEC extraction pilot")
     st.info("These are development results. The planned independent test has not run.")
     requests_tab, pilot_tab = st.tabs(["Requests 1–6", "Colab evidence · 36 companies"])
+
+    def show_evidence(caption, code, output):
+        st.markdown(f"**{caption}**")
+        st.caption("Source code excerpt (not run by Streamlit)")
+        st.code(code, language="python")
+        st.caption("Saved output or verified audit result")
+        st.code(output, language="text")
+
     with requests_tab:
-        rows = [
-            ("1. Verify earlier results", "Changing the choice order did not change the saved Validation score. A simulated tie correctly returned no answer."),
-            ("2. Explain the extraction pilot", "On the same 96 Validation questions, C selected 57 correct cells and D selected 62. The difference was not statistically significant."),
-            ("3. Check sharper table images", "On the 32-question New8 check, sharper crops did not change the archived C and D results: 6 and 4 correct cells."),
-            ("4. Evaluate the balanced challenge", "The exact-cell result covers 32 base questions. The separate four-choice check used six variants per base question, not 192 independent questions."),
-            ("5. Plan the independent evaluation", "Set the scoring rule and sample-size plan before opening new company data."),
-            ("6. Check input coverage and replay", "Both CPU replays reproduced the archived C/D selections. Replaying a saved model is not retraining it."),
-        ]
-        for title, result in rows:
-            st.markdown(f"**{title}**")
-            st.write(result)
+        st.caption("Each request has its original code or a relevant excerpt, its output, and what the result does and does not show.")
+        for number, title, result, scope, blocks in MEETING07_EVIDENCE:
+            st.subheader(f"Request {number} · {title}")
+            st.markdown(f"**{result}**")
+            st.write(scope)
+            with st.expander(f"Request {number} · Code and output", expanded=(number == 1)):
+                for caption, code, output in blocks:
+                    show_evidence(caption, code, output)
+        st.divider()
+        st.download_button(
+            "Download the Colab evidence notebook",
+            MEETING07_NOTEBOOK,
+            file_name="FinIntel_Meeting_7_Evidence_Excerpts.ipynb",
+            mime="application/x-ipynb+json",
+        )
+        st.caption("The download contains the same public excerpts, not the private notebooks or datasets. The Request 5 power calculation can be run on its own in Colab.")
     with pilot_tab:
         st.subheader("A separate SEC pilot across 36 companies")
-        st.caption("Separate from the 96-question Validation set and the 32-question New8 check.")
+        st.caption("Separate from the earlier 96-question Validation set and the 32-question New8 check.")
         counts = st.columns(3)
         counts[0].metric("Train", "20 companies")
         counts[1].metric("Validation", "8 companies")
         counts[2].metric("Original test", "8 companies")
-        st.markdown("**Step 7 · Company split.** 480 questions after source checks: 275 Train, 103 Validation, 102 original test. No company was in two splits.")
-        st.markdown("**Step 16 · OCR.** OCR read 1,302 of 1,302 printed headers correctly on available original-test crops. This measures transcription, not extraction accuracy.")
-        st.markdown("**Step 11 · Early stopping.** For value-only D, Validation peaked at 42.72% at training round 20 and fell to 37.86% at round 25. The run kept the round-20 checkpoint.")
-        st.markdown("**Step 26 · Archived value-only test.** Correct cell selections out of 102, on the same questions for all four models:")
-        st.bar_chart({"Model A": [8], "Model B": [37], "Model C": [29], "Model D": [31]}, horizontal=True)
+        st.caption("Step 7 · 480 questions after source checks: 275 Train, 103 Validation, 102 original test. No company was in two splits.")
+
+        st.markdown("**1. Starting point: value-only baseline**")
         st.table([
             {"Model": model, "Correct cells (out of 102)": count}
             for model, count in (("A", 8), ("B", 37), ("C", 29), ("D", 31))
         ])
-        st.markdown("**Separate fresh-panel check.** After removing the answer-key date from the inputs, C averaged 95.00 and D 97.67 correct out of 102 across three runs. The difference was +2.61 percentage points (95% interval: −1.85 to +10.10), so it does not establish that D is better.")
-        st.caption("Results that used the answer-key date are excluded. PCA is under evaluation.")
+        st.caption("The original 102-question panel. Step 26 checked these figures against the saved results.")
+        st.markdown("**2. OCR recovered the printed headers**")
+        st.write("Step 16: OCR read all 1,302 printed headers on the available original-test crops. This is transcription accuracy, not answer extraction accuracy.")
+        with st.expander("Step 16 · OCR code and saved transcription output"):
+            show_evidence("Original Colab transcription report", *MEETING07_OCR)
+        st.caption("Step 11 · For value-only D, Validation peaked at 42.72% at epoch 20 and fell to 37.86% at epoch 25. Early stopping kept the epoch-20 checkpoint.")
 
+        st.markdown("**3. Rechecked extraction after removing the answer-key date**")
+        st.table([
+            {"Model": "C", "Mean correct out of 102": 95.00},
+            {"Model": "D", "Mean correct out of 102": 97.67},
+        ])
+        st.write("Separate fresh panel, three seeds. D was ahead by 2.61 percentage points (95% company-cluster interval: −1.85 to +10.10). That does not establish that D is better. This fresh-panel result is not a before-and-after comparison with the original value-only baseline.")
+        st.caption("Source: corrected rerun audit. PCA is under evaluation.")
+
+        st.divider()
+        st.subheader("What the original Colab stages actually showed")
+        st.warning("Keep these archived stages separate from corrected results. Some used an answer-key date, and the ViT diagnostic gave the two models different inputs.")
+        for caption, scope, code, output in MEETING07_PILOT_ARCHIVE:
+            with st.expander(caption):
+                st.write(scope)
+                show_evidence("Original Colab code and recorded output", code, output)
 
 
 dashboard_view = st.sidebar.radio(
@@ -748,4 +964,5 @@ with tab_boundary:
         "-- far too small for a performance claim. This subset exists to validate "
         "that the pipeline runs end to end, not to evaluate it."
     )
+
 
